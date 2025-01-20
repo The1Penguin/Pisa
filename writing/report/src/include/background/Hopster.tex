@@ -1,0 +1,15 @@
+\section{Hopster}\label{sec:hopster}
+Hopster is another theory exploration tool, made for HOL4 \autocite{Hopster}.
+It is inspired by Hipster and therefore uses systems similar to those explained in \cref{sec:hipster}.
+However, similar to Lean, HOL4 does not have code generation to Haskell, and therefore a transpiler had to be created.
+Similarly to Hipster, Hopster does routine reasoning, but instead of throwing away trivial examples Hopster keeps them.
+
+A difference that exists between Lean and HOL4 is the way that types are encoded.
+In HOL4, as \citeauthor{Hopster} mentions, there is a difference between types and terms.
+They exist on two different levels of the language, meanwhile, in Lean, such a distinction is harder to make.
+Lean uses dependent types which allows for values as types, as mentioned in \cref{sec:dependent-types}.
+This means that a more involved translation would be needed for Pisa.
+
+Hopster uses TIP tools by~\cite{TIP}, and therefore had to extend TIP tools to be able to preserve names.
+This was done by annotating function definition with comments labeling the HOL4 equivalent names.
+Pisa instead utilized a mapping between names when converting the naming scheme back, which was implemented in Pisa itself.

@@ -1,0 +1,19 @@
+\begin{tikzpicture}[node distance=1.5 and 4.6, font=\footnotesize, ->, >={Stealth[sep]}]
+  \tikzstyle{module} = [rectangle, draw, rounded corners=11, inner sep=7, minimum height=23]
+  \tikzstyle{desc} = [font=\scriptsize, inner sep=1]
+  \tikzstyle{desco} = [desc, pos=0.5, align=center, fill=white]
+  \tikzstyle{desca} = [desc, pos=0.48, above=0.4ex]
+
+  \node[module]  (lm)  {Lean Macro};
+  \node[draw, left =0.4 of lm] (us)  {User};
+  \node[module, below =of lm]      (l2h) {Lean to Haskell transpiler};
+  \node[module, right =of l2h]     (cg)  {Haskell Conjecture generator};
+  \node[module, above =of cg]      (h2l) {Conjectures to Lean code};
+
+  \draw              (us)  -- (lm);
+  \draw[shorten >=7] (lm)  -- (cg)  node[desco] {Size parameter for term \\ generation and aliases \\ to use for definitions};
+  \draw              (lm)  -- (l2h) node[desco] {Set of definitions};
+  \draw              (l2h) -- (cg)  node[desca] {Definitions translated to Haskell};
+  \draw              (cg)  -- (h2l) node[desco] {List of conjectures \\ in an internal format};
+  \draw              (h2l) -- (lm)  node[desca] {\raisebox{0pt}[\height][0pt]{Lean code of conjectures}};
+\end{tikzpicture}

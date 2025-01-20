@@ -1,0 +1,127 @@
+% CREATED BY DAVID FRISK, 2016
+\chapter{Introduction}\label{sec:introduction}
+Computer verification of mathematical proofs has become more and more prevalent.
+This is commonly accomplished using interactive theorem provers (ITPs).
+ITPs provide an interface for users to iteratively work on a proof, while the proof itself is verified to hold.
+During formalizations of proofs, an ITP can hide tedious aspects such as rearranging terms due to commutativity \autocite{MathReasoning}.
+An ITP will record all necessary steps that constitute a proof, and is then able to verify that the final proof is indeed correct \autocite{ProofAssistants}.
+It will, however, not necessarily help with the discovery of a proof nor the presentation of it.
+
+Tooling for the discovery of proofs was presented by \textcite{TheoryExploration} along with the concept of ``Theory Exploration''.
+Conceptually, while working on proofs, one would typically consider more than just a single theorem.
+The process is better described as an exploration ``of an entire theory''.
+In other words, one can extend the understanding of a field by looking at interactions between concepts in said field.
+
+This idea of theory explorations has been further explored by QuickSpec \autocite{Quickspec} and then implemented in Hipster \autocite{Hipster}.
+QuickSpec is a tool created using QuickCheck \autocite{QuickCheck} that will, given a set of functions, heuristically find conjectures that seem to hold based on auto generated inputs to them.
+Hipster integrates the ``Theory exploration'' of QuickSpec into the ITP known as Isabelle/HOL, by way of exporting the current context of proofs and functions.
+Furthermore, there has been an extension of QuickSpec called RoughSpec \autocite{Roughspec}.
+RoughSpec is able to limit the search space of QuickSpec based on given shapes of lemmas.
+These can be in the form of associativity, commutativity, or identity but can also take other forms.
+
+The idea for this project, called Pisa, is to implement a similar function as Hipster does, but for the ITP and programming language Lean~\autocite{Lean}.
+Lean has a growing user-base with a mathematical focus.
+When exploring a new problem domain, a tool such as this could help users find new ways of thinking, or help users that are new to the field work through their own understanding of the domain.
+
+\section{Aim}\label{sec:introduction:problem-statement}
+The project aim is to facilitate conjecture generation within Lean, in a tool called Pisa.
+A transpiler (compilation from one language to another) from a subset of Lean to Haskell is needed in order to utilize existing frameworks in Haskell.
+QuickSpec and RoughSpec could then be used in conjunction with the transpiler to create Pisa.
+
+Pisa allows a user to find conjectures that may assist in proving aspects in the domain they are working in.
+For example, if one is working in the domain of Booleans and asking Pisa for conjectures regarding the functions §not§ and §and§, one could get conjectures such as the ones seen in \cref{lst:usage_resolved}.
+This leaves the user to implement the proofs of the conjectures.
+Further, no conjecture generation tool exists for Lean 4 as far as we, the authors, know.
+Pisa would therefore provide the functionality of conjecture generation for Lean.
+
+\begin{listing}[H]
+\begin{LeanCode}
+  theorem conjecture0                :       not false = true
+  theorem conjecture1                :        not true = false
+  theorem conjecture2 (x y : Bool)   :         and x y = and y x
+  theorem conjecture3 (x : Bool)     :         and x x = x
+  theorem conjecture4 (x : Bool)     :     and x false = false
+  theorem conjecture5 (x : Bool)     :      and x true = x
+  theorem conjecture6 (x : Bool)     :     not (not x) = x
+  theorem conjecture7 (x : Bool)     :   and x (not x) = false
+  theorem conjecture8 (x : Bool)     :      and true x = x
+  theorem conjecture9 (x y z : Bool) : and (and x y) z = and x (and y z)
+\end{LeanCode}
+\caption[Conjectures generated in the domain of Booleans with §not§ and §and§.]{
+  Conjectures generated in the domain of Booleans with the functions §not§ and §and§.
+  The code snippet has been altered to improve readability.
+}
+\label{lst:usage_resolved}
+\end{listing}
+
+As well as adding support for conjecture generation, a new backend for Lean would be created.
+The creation of a different backend was outlined as future work by~\cite{Lean4}.
+This could also allow for analysis on the generated Haskell code by other tools.
+
+\subsection{Goals}\label{sec:introduction:goals}
+The problem statement is expanded into the following goals:
+
+\goal{Translation: Support for enumerated types}\label{goal:enumerated-types}
+Theorems in Lean are primarily modeled with data types and functions.
+Simple types, such as Booleans, are essential to perform the bare necessities of Pisa.
+Without such capabilities, no more complex values can be created.
+To properly translate any Lean code, Pisa must be able to create a corresponding representation to these enumerable types when generating Haskell code.
+
+\goal{Translation: Support for recursive types}\label{goal:recursive-types}
+Furthering \cref{goal:enumerated-types} is recursive data types.
+This would allow functions that utilize recursion to achieve their result.
+Recursive functions are not handled in the same way between Haskell and Lean, and therefore is a necessary part to ensure compatibility.
+One example of this is the natural numbers.
+
+Recursion is by necessity a more involved process than one using only enumerable data types.
+It requires the generated code to handle calls to the same function and handling the operations after the sub call is finished.
+Further, the evaluation strategy that Lean uses is different from Haskell.
+This difference has to be handled in some way to ensure that the translation is representable of the original.
+
+\goal{Translation: Support for polymorphic types}\label{goal:polymorphic-types}
+Many simple types are similar and may be represented by a more generic type.
+For example, §List A§ may contain elements of any data type §A§.
+This abstraction, called polymorphism, may be a little more intricate to create a correspondence when generating code and is not strictly necessary.
+However, it is commonly used and useful when reasoning about the shared properties that types have.
+Polymorphism can also lead to conjectures that hold more universally for a concept than instantiated types.
+Concepts such as \cref{equ:reverse1} holds a higher importance for a proof than \cref{equ:reverse2}.
+\begin{align}
+  ∀A.\; λa : §List§\ A → §reverse§\ (§reverse§\ a) &≡ a \label{equ:reverse1}\\
+        λa : §List§\ ℕ → §reverse§\ (§reverse§\ a) &≡ a \label{equ:reverse2}
+\end{align}
+
+\goal{Conjecture generation: Conjecture about the translation}\label{goal:conjecture}
+The translation mentioned in \cref{goal:enumerated-types,goal:recursive-types,goal:polymorphic-types}, are created in order to facilitate the conjecture generation.
+Therefore, utilizing them as a base would allow the usage of tooling in Haskell to generate conjectures.
+With conjectures generated, one could then port them back into Lean for a better user experience.
+
+\goal{Tool: Integration of the subsystems}\label{goal:integration}
+To complete Pisa the different components have to be integrated with each other.
+A unified tool would greatly improve ease of use as opposed to a bundle of separate utilities the user has to stitch together.
+A way of utilizing Pisa within a code editor would be a desirable function of the system.
+
+\goal{Conjecture generation: Relevance of the generated conjectures}\label{goal:relevance}
+For Pisa to help with explorations of theorems, it needs to produce relevant conjectures.
+A comparison to existing libraries would therefore indicate how well Pisa performs.
+
+\section{Limitations}\label{sec:introduction:limitations}
+As mentioned in \cref{sec:introduction:problem-statement}, Pisa aims to support a subset of Lean.
+This is due to Lean being a complete programming language and this thesis is solely focused on the ITP aspects of it.
+Therefore, a subset was used, and it is explained in \cref{sec:supported-subset-of-lean}.
+However, for use as an ITP Pisa is still able to handle the most general cases.
+This means that the fundamentals of a user's chosen domain will be able to be found using Pisa.
+
+\section{Overview of Pisa}\label{sec:introduction:overview}
+
+\begin{figure}[H]
+  \centering
+  \input{figure/overview.tikz}
+  \caption{An overview of the information flow of Pisa.}\label{fig:intro-overview}
+\end{figure}
+
+\Cref{fig:intro-overview} shows a high level of how Pisa operates.
+The macro will traverse the structure of definitions provided by the user and collect them for translation.
+This is done by traversing both an intermediate representation of functions, and a typed lambda calculus for data types.
+These definitions are sent to the transpiler to generate Haskell versions of the definitions.
+With a Haskell representation of the Lean code, conjectures are generated utilizing QuickSpec and RoughSpec.
+Last, the conjectures generated are ported back into Lean where they are provided to the user.

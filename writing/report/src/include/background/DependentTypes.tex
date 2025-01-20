@@ -1,0 +1,84 @@
+\section{Dependent types}\label{sec:dependent-types}
+Dependent types extend the common notion of types in programming languages by qualifying a type on other values.
+This is similar to how polymorphism allows the inverse; values that depend on types \autocite{deptypes}.
+A familiar example involves a representation of vectors.
+Their type may be contingent on the type of the values they contain, i.e. §Vector~α§ for any type §α§.
+Polymorphism enables generalized definitions, such as a function that appends any two similar instances of these vectors.
+With dependent types, properties can be encoded in the type, such as the vector's length.
+The type §Vector~ℕ~3§ informs us that a value contains three natural numbers.
+
+Encoding properties in types becomes particularly useful with the realization of the Curry–Howard correspondence \autocite{martinlöf}.
+The correspondence relates propositions and their proofs with types and the construction of well typed values of said type.
+In other words, if a proposition can be represented with a type, finding a value of that type is a sufficient proof of the proposition.
+By encoding properties in the types, other propositions may be represented.
+As an example, \cref{equ:sumodd} states that the sum of two odd numbers is even.
+Without dependent types this could not be expressed as a type.
+
+\vspace{-0.9cm}
+\begin{align}
+    λn : ℕ → λm : ℕ → §odd§\ n → §odd§\ m → §even§\ (n + m) \label{equ:sumodd}
+\end{align}
+
+\vspace{-0.35cm}
+This notion can also sometimes be conceptualized as embedding a proof in the type.
+Using the earlier example of vectors, an inductive Lean definition is provided in \cref{lst:dependent_vector}.
+By definition, the only possible construction of a vector with length $0$ is the empty vector, §Nil§.
+Similarly, vectors of length $n+1$ can only be constructed by adding an element to a vector of length $n$, using §Cons§.
+The definition thus ensures the length property is sound.
+When coming across a vector of length $m$ in an expression accepted by the type checker, it can be presumed to indeed contain $m$ items.
+
+With a proof of the length in the type, functions can be constructed that otherwise would result in $⊥$.
+This is exemplified by the definition of §head§ in \cref{lst:dependent_vector}.
+The function describes that it handles the domain of vectors with at least one element (due to the length being non-zero).
+It is therefore able to return the first element of the vector.
+Without dependent types the result type has to change.
+This could be done by wrapping the result in a type containing the value or an exception.
+Sometimes this exception is not encoded by the type system and throws a runtime error.
+
+\begin{listing}[H]
+\begin{LeanCode}
+inductive Vector : Type → Nat → Type where
+  | Nil  : Vector α 0
+  | Cons : α → Vector α n → Vector α (n+1)
+
+def head (v : Vector α (n+1)) : α :=
+  match v with
+    | .Cons a _ => a
+
+def append (v : Vector α n) (w : Vector α m) : Vector α (m+n) :=
+  match v with
+    | .Nil => w
+    | .Cons a v' => .Cons a (append v' w)
+\end{LeanCode}
+\caption{Example of a vector defined with dependent types in Lean.}
+\label{lst:dependent_vector}
+\end{listing}
+
+However, this embedding requires that any function operating on these types must express how it affects the property.
+A dependently typed definition of §append§ for vectors has to describe that the combined vector has the combined length of the arguments.
+As can be seen in \cref{lst:dependent_vector}, since the length is a regular value the resulting length can be described by a simple addition of the two obtained in the arguments.
+With this signature Lean will ensure that the definition indeed does return a vector of the combined length.
+In this case the proof is trivially realized by expanding the definitions of §Nil§, §Cons§, and §append§.
+Lean will automatically do this without any further assistance.
+
+What proofs to include in the types mostly depends on which guarantees are needed in the context.
+The signature of §append§ is not sufficient to ensure that all values of the vectors are retained or that the final ordering is as one would expect.
+A more precise signature could be formulated with another definition for vectors, but may not be necessary in most situations.
+Likewise, the length of a list is often not necessary or possible to determine.
+
+If a property is mostly irrelevant, the proof may instead be derived separately when needed.
+This is shown by the alternative definition of §head§ in \cref{lst:dep_head}.
+In this example, the match is complete without a branch on §.Nil§ as it would cause a contradiction with the premise that §as§ is not empty.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+def head (as : List α) (proof : as ≠ []) : α :=
+  match as with
+    | .Cons a _ => a
+\end{LeanCode}
+\caption[An alternative definition of §head§ to the one in \cref{lst:dependent_vector}.]{
+  An alternative definition of §head§ to the one in \cref{lst:dependent_vector}.
+  This version keeps the proof is separate from the primary type.
+}
+\label{lst:dep_head}
+\end{listing}

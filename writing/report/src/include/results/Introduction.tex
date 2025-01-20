@@ -1,0 +1,38 @@
+% CREATED BY DAVID FRISK, 2016
+\chapter{Results}\label{chp:results}
+The result of this thesis can be compared to the aim outlined in \cref{sec:introduction:problem-statement}.
+With Pisa, a user is able to generate conjectures based on their own definitions, from a subset of Lean.
+It was feasible to do a translation from Lean to Haskell via a combination of the IR and Lambda calculus to encapsulate the different aspects of functions contra types.
+A combination of QuickSpec and RoughSpec were then able to generate conjectures that then were translated to Lean theorems, left to be proven by the user.
+
+To show that Pisa is able to translate and conjecture about the goals, multiple data types were chosen that encapsulate the different aspects of \cref{goal:enumerated-types,goal:recursive-types,goal:polymorphic-types}.
+Booleans were chosen as the enumerable type, due to it being one of the fundamental types used by most programming languages.
+For recursive data types, natural numbers were chosen, encoded as Peano numbers.
+Natural numbers show a practical example in which recursion is needed to be able to use the basic functions one would expect.
+As for Polymorphic data types, lists and binary trees were chosen.
+They both use polymorphism, and are both recursive.
+Each data type and their associated functions were implemented.
+All the chosen data types and associated functions were able to be translated which means that the implemented Haskell interface is able to support these classes of types.
+Furthermore, the chosen data types and their associated functions are able to used for conjecture generation using the translation, thus fulfilling \nref{goal:conjecture}.
+Pisa was also able to be utilized from within the editor, using a macro, as outlined in \nref{sec:integration-of-subsystem}, fulfilling \cref{goal:integration}.
+
+To show the relevance (see \cref{goal:relevance}) of the generated conjectures, the data types which has an equivalent in Mathlib \autocite{Mathlib4} will be compared using precision and recall analysis \autocite{PrecisionAndRecall}.
+The formulas that will be used can be seen in \cref{eqs:precisionandrecall}.
+Recall shows how well Pisa generates all of the potential true cases, while precision measures the degree of conjectures that can be found in mathlib based of the generated ones.
+Both of these values range between 0 and 1.
+Discussion of these results will be covered in \cref{sec:discussion}
+
+\begin{equationset}[H]
+\begin{gather}
+  TP = \text{No. lemmas both in generated conjectures and in mathlib} \nonumber \\
+  FP = \text{No. lemmas in generated conjectures, but not in mathlib} \nonumber \\
+  FN = \text{No. lemmas in mathlib, but not in generated conjectures} \nonumber \\
+  Precision = \frac{TP}{TP + FP} \nonumber \\
+  Recall = \frac{TP}{TP + FN} \nonumber
+\end{gather}
+\caption{Precision and recall formulas.}\label{eqs:precisionandrecall}
+\end{equationset}
+
+\input{Enum}
+\input{Recursive}
+\input{Polymorphic}

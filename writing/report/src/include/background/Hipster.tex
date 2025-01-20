@@ -1,0 +1,23 @@
+\section{Hipster}\label{sec:hipster}
+Hipster is a similar project to Pisa, as in it adds a theory exploration tool into the ITP known as Isabelle/HOL \autocite{Hipster}.
+This is accomplished using the following main parts.
+First, Isabelle/HOL has a built-in code generator that is able to translate definitions into Haskell.
+This allows the use of the second part, which is QuickSpec.
+QuickSpec allows Hipster to find conjectures on the definitions, and these conjectures are then translated in to the proof style of Isabelle/HOL.
+These conjectures are then attempted to be automatically proven by tooling in Isabelle/HOL, and are then presented to the end user.
+
+Comparing this to Pisa, the main difference to this thesis is the presence of a code generator to Haskell.
+Since Lean does not have a code generator to Haskell, one has to be implemented to attempt the same approach that was taken by Hipster.
+
+There is a difference in how functions that are partially defined are handled between Isabelle/HOL and Lean.
+In Isabelle/HOL, partially defined functions will, if using an unspecified input, return an arbitrary value.
+Meanwhile, in Haskell there is a specified behavior, which is crashing.
+Therefore, Hipster had to implement behavior to handle this difference.
+In Lean, you are unable to construct a partially defined function, without marking it as such.
+One has to match on all the cases that can occur from a data type.
+Further, if a function is marked as partial, it cannot be used in proofs.
+Thus, dealing with partial functions is not an aspect that needs to be handled.
+
+One major aspect of Hipster that is not attempted is that of discarding lemmas that can be solved by routine reasoning.
+Pisa does not attempt to do this.
+Every part of the rewrite needs to be represented in the context, and this would therefore be a hindrance to the users of Pisa.

@@ -1,0 +1,613 @@
+@article{Quickspec,
+    title={Quick specifications for the busy programmer},
+    volume={27},
+    doi={10.1017/S0956796817000090},
+    journal={Journal of Functional Programming},
+    author={Smallbone, Nicholas and Johansson, Moa and Claessen, Koen and Algehed, Maximilian},
+    year={2017},
+    pages={e18}
+}
+
+@InProceedings{Hipster,
+    author="Johansson, Moa and Ros{\'e}n, Dan and Smallbone, Nicholas and Claessen, Koen",
+    editor="Watt, Stephen M. and Davenport, James H. and Sexton, Alan P. and Sojka, Petr and Urban, Josef",
+    title="Hipster: Integrating Theory Exploration in a Proof Assistant",
+    booktitle="Intelligent Computer Mathematics",
+    year="2014",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="108--122",
+    abstract="This paper describes Hipster, a system integrating theory exploration with the proof assistant Isabelle/HOL. Theory exploration is a technique for automatically discovering new interesting lemmas in a given theory development. Hipster can be used in two main modes. The first is exploratory mode, used for automatically generating basic lemmas about a given set of datatypes and functions in a new theory development. The second is proof mode, used in a particular proof attempt, trying to discover the missing lemmas which would allow the current goal to be proved. Hipster's proof mode complements and boosts existing proof automation techniques that rely on automatically selecting existing lemmas, by inventing new lemmas that need induction to be proved. We show example uses of both modes.",
+    isbn="978-3-319-08434-3",
+    doi={10.1007/978-3-319-08434-3_9}
+}
+
+@InProceedings{VampireQuickSpec,
+    author="Einarsd{\'o}ttir, S{\'o}lr{\'u}n Halla and Hajdu, M{\'a}rton and Johansson, Moa and Smallbone, Nicholas and Suda, Martin",
+    editor="Benzm{\"u}ller, Christoph and Heule, Marijn J.H. and Schmidt, Renate A.",
+    title="Lemma Discovery and Strategies for Automated Induction",
+    booktitle="Automated Reasoning",
+    year="2024",
+    publisher="Springer Nature Switzerland",
+    address="Cham",
+    pages="214--232",
+    abstract="We investigate how the automated inductive proof capabilities of the first-order prover Vampire can be improved by adding lemmas conjectured by the QuickSpec theory exploration system and by training strategy schedules specialized for inductive proofs. We find that adding lemmas improves performance (measured in number of proofs found for benchmark problems) by {\$}{\$}40{\backslash}{\%}{\$}{\$}40{\%}compared to Vampire's plain structural induction as baseline. Strategy training alone increases the number of proofs found by {\$}{\$}130{\backslash}{\%}{\$}{\$}130{\%}, and the two methods in combination provide an increase of {\$}{\$}183{\backslash}{\%}{\$}{\$}183{\%}. By combining strategy training and lemma discovery we can prove more inductive benchmarks than previous state-of-the-art inductive proof systems (HipSpec and CVC4).",
+    isbn="978-3-031-63498-7"
+}
+
+@InProceedings{Vampire,
+    author="Kov{\'a}cs, Laura and Voronkov, Andrei",
+    editor="Sharygina, Natasha and Veith, Helmut",
+    title="First-Order Theorem Proving and Vampire",
+    booktitle="Computer Aided Verification",
+    year="2013",
+    publisher="Springer Berlin Heidelberg",
+    address="Berlin, Heidelberg",
+    pages="1--35",
+    abstract="In this paper we give a short introduction in first-order theorem proving and the use of the theorem prover Vampire. We discuss the superposition calculus and explain the key concepts of saturation and redundancy elimination, present saturation algorithms and preprocessing, and demonstrate how these concepts are implemented in Vampire. Further, we also cover more recent topics and features of Vampire designed for advanced applications, including satisfiability checking, theory reasoning, interpolation, consequence elimination, and program analysis.",
+    isbn="978-3-642-39799-8"
+}
+
+@article{fake_dependent,
+  author  = {Dominique Unruh},
+  title   = {With-Type – Poor man's dependent types},
+  journal = {Archive of Formal Proofs},
+  month   = {8},
+  year    = {2024},
+  url     = {https://isa-afp.org/entries/With_Type.html},
+  ISSN    = {2150-914x},
+}
+
+@inproceedings{Roughspec,
+    author = {Einarsd\'{o}ttir, S\'{o}lr\'{u}n Halla and Smallbone, Nicholas and Johansson, Moa},
+    title = {Template-based Theory Exploration: Discovering Properties of Functional Programs by Testing},
+    year = {2021},
+    isbn = {9781450389631},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    doi = {10.1145/3462172.3462192},
+    abstract = {We present RoughSpec, a template-based extension of the theory exploration tool QuickSpec. QuickSpec uses testing to automatically discover equational properties about functions in a Haskell program. These properties can help the user understand the program or be used as a source of possible lemmas in proofs of the program’s correctness. In RoughSpec, the user supplies templates, which describe families of laws such as associativity and distributivity, and we only consider properties that match the templates. This restriction limits the search space and ensures that only relevant properties are discovered. In this way, we sacrifice broad search for more direction towards desirable property patterns, which makes theory exploration tractable and scalable. We also combine RoughSpec with QuickSpec, using QuickSpec to perform a complete search for smaller term sizes, while using templates for larger, more complex properties, in order to leverage the strengths of both systems.},
+    booktitle = {Proceedings of the 32nd Symposium on Implementation and Application of Functional Languages},
+    pages = {67–78},
+    numpages = {12},
+    keywords = {Algebraic properties, Functional programming, Program understanding, Property-based testing, QuickSpec, Theory exploration},
+    location = {Canterbury, United Kingdom},
+    series = {IFL '20}
+}
+
+@InProceedings{Lean4,
+    author="de Moura, Leonardo and Ullrich, Sebastian",
+    editor="Platzer, Andr{\'e} and Sutcliffe, Geoff",
+    title="The Lean 4 Theorem Prover and Programming Language",
+    booktitle="Automated Deduction -- CADE 28",
+    year="2021",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="625--635",
+    abstract="Lean 4 is a reimplementation of the Lean interactive theorem prover (ITP) in Lean itself. It addresses many shortcomings of the previous versions and contains many new features. Lean 4 is fully extensible: users can modify and extend the parser, elaborator, tactics, decision procedures, pretty printer, and code generator. The new system has a hygienic macro system custom-built for ITPs. It contains a new typeclass resolution procedure based on tabled resolution, addressing significant performance problems reported by the growing user base. Lean 4 is also an efficient functional programming language based on a novel programming paradigm called functional but in-place. Efficient code generation is crucial for Lean users because many write custom proof automation procedures in Lean itself.",
+    isbn="978-3-030-79876-5",
+    doi={10.1007/978-3-030-79876-5_37}
+}
+
+@InProceedings{Lean,
+    author="de Moura, Leonardo
+    and Kong, Soonho
+    and Avigad, Jeremy
+    and van Doorn, Floris
+    and von Raumer, Jakob",
+    editor="Felty, Amy P.
+    and Middeldorp, Aart",
+    title="The Lean Theorem Prover (System Description)",
+    booktitle="Automated Deduction - CADE-25",
+    year="2015",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="378--388",
+    abstract="Lean is a new open source theorem prover being developed at Microsoft Research and Carnegie Mellon University, with a small trusted kernel based on dependent type theory. It aims to bridge the gap between interactive and automated theorem proving, by situating automated tools and methods in a framework that supports user interaction and the construction of fully specified axiomatic proofs. Lean is an ongoing and long-term effort, but it already provides many useful components, integrated development environments, and a rich API which can be used to embed it into other systems. It is currently being used to formalize category theory, homotopy type theory, and abstract algebra. We describe the project goals, system architecture, and main features, and we discuss applications and continuing work.",
+    isbn="978-3-319-21401-6",
+    doi={10.1007/978-3-319-21401-6_26}
+}
+
+@mastersthesis{Mario,
+    author  = "Mario Carneiro",
+    title   = "The type theory of Lean.",
+    school  = "Carnegie-Mellon University",
+    year    = 2019,
+    month   = 04,
+    url = {https://github.com/digama0/lean-type-theory/releases/download/v1.0/main.pdf}
+}
+
+@book{typesBook,
+    title={Types and programming languages},
+    author={Pierce, Benjamin C},
+    year={2002},
+    publisher={MIT press},
+}
+@inbook{deptypes,
+    crossref = {typesBook},
+    chapter = {30.5},
+    pages   = {462--466},
+}
+
+@book{martinlöf,
+  title={Programming in Martin-Löf’s type theory},
+  author={Nordström, Bengt and Petersson, Kent and Smith, Jan M},
+  volume={200},
+  year={1990},
+  publisher={Oxford University Press Oxford}
+}
+
+@InProceedings{LeanMacros,
+    author="Ullrich, Sebastian and de Moura, Leonardo",
+    editor="Peltier, Nicolas and Sofronie-Stokkermans, Viorica",
+    title="Beyond Notations: Hygienic Macro Expansion for Theorem Proving Languages",
+    booktitle="Automated Reasoning",
+    year="2020",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="167--182",
+    abstract="In interactive theorem provers (ITPs), extensible syntax is not only crucial to lower the cognitive burden of manipulating complex mathematical objects, but plays a critical role in developing reusable abstractions in libraries. Most ITPs support such extensions in the form of restrictive ``syntax sugar'' substitutions and other ad hoc mechanisms, which are too rudimentary to support many desirable abstractions. As a result, libraries are littered with unnecessary redundancy. Tactic languages in these systems are plagued by a seemingly unrelated issue: accidental name capture, which often produces unexpected and counterintuitive behavior. We take ideas from the Scheme family of programming languages and solve these two problems simultaneously by proposing a novel hygienic macro system custom-built for ITPs. We further describe how our approach can be extended to cover type-directed macro expansion resulting in a single, uniform system offering multiple abstraction levels that range from supporting simplest syntax sugars to elaboration of formerly baked-in syntax. We have implemented our new macro system and integrated it into the upcoming version (v4) of the Lean theorem prover. Despite its expressivity, the macro system is simple enough that it can easily be integrated into other systems.",
+    isbn="978-3-030-51054-1",
+    doi={10.1007/978-3-030-51054-1_10}
+}
+
+
+@online{LeanAuto,
+    author = {{Leanprover Community}},
+    title = {{Lean-auto}},
+    year = 2024,
+    url = {https://reservoir.lean-lang.org/@leanprover-community/auto},
+    urldate = {2024-11-26}
+}
+
+@inproceedings{LOL,
+  title={LOL: A library of lemma templates for data-driven conjecturing},
+  author={Einarsd{\'o}ttir, S{\'o}lr{\'u}n Halla and Johansson, Moa and Smallbone, Nicholas},
+  booktitle={Work-in-progress papers presented at the 15th Conference on Intelligent Computer Mathematics (CICM 2022) Informal Proceedings},
+  pages={22},
+  year={2022}
+}
+
+@online{DepHaskell,
+    author = {Vladislav Zavialov and Andrey Borzenkov},
+    title = {Serokell’s Work on GHC: Dependent Types, Part 4},
+    year = 2024,
+    url = {https://serokell.io/blog/serokell-s-work-on-ghc-dependent-types-part-4},
+    urldate = {2024-11-27}
+}
+
+@online{Reservoir,
+    author = {{Leanprover}},
+    title = {Reservoir},
+    year = 2024,
+    url = {https://reservoir.lean-lang.org/},
+    urldate = {2024-11-27}
+}
+
+@online{LeanConjectureLLM,
+    author = {Matt Feller},
+    title = {lean-conjecture-generator},
+    year = 2024,
+    url = {https://github.com/mattfeller/lean-conjecture-generator},
+    urldate = {2024-11-27},
+    note = {Revision: \\ dfcdf83dc2df892b364693e65c56081a3dd11e04}
+}
+
+@inproceedings{LeanDojo,
+    author = {Yang, Kaiyu and Swope, Aidan and Gu, Alex and Chalamala, Rahul and Song, Peiyang and Yu, Shixing and Godil, Saad and Prenger, Ryan J and Anandkumar, Animashree},
+    booktitle = {Advances in Neural Information Processing Systems},
+    editor = {A. Oh and T. Naumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
+    pages = {21573--21612},
+    publisher = {Curran Associates, Inc.},
+    title = {{LeanDojo}: Theorem Proving with Retrieval-Augmented Language Models},
+    url = {https://proceedings.neurips.cc/paper_files/paper/2023/file/4441469427094f8873d0fecb0c4e1cee-Paper-Datasets_and_Benchmarks.pdf},
+    volume = {36},
+    year = {2023}
+}
+
+@InProceedings{PrettyPrint,
+    author="Hughes, John",
+    editor="Jeuring, Johan
+    and Meijer, Erik",
+    title="The design of a pretty-printing library",
+    booktitle="Advanced Functional Programming",
+    year="1995",
+    publisher="Springer Berlin Heidelberg",
+    address="Berlin, Heidelberg",
+    pages="53--96",
+    abstract="In this chapter we have considered the design of combinator libraries. We saw how studying the algebraic properties of the combinators desired can both help to suggest natural choices of representation, and guide the implementation of the operators. We saw several examples --- lists, monads, and a pretty-printing library. For this kind of program development we need a language with higher-order functions and lazy evaluation, for which equational reasoning is valid; in other words, Haskell is ideally suited.",
+    isbn="978-3-540-49270-2"
+}
+
+@online{MathlibStats,
+    author={{The mathlib Community}},
+    title = {Mathlib statistics},
+    year = 2024,
+    url = {https://leanprover-community.github.io/mathlib_stats.html},
+    urldate = {2024-11-28},
+}
+
+@inproceedings{MathlibCommunity,
+    series={POPL ’20},
+    title={The lean mathematical library},
+    doi={10.1145/3372885.3373824},
+    booktitle={Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs},
+    publisher={ACM},
+    author={{The mathlib Community}},
+    year={2020},
+    month=jan, collection={POPL ’20}
+}
+
+@online{Mathlib4,
+    author={{The mathlib Community}},
+    title = {mathlib4},
+    year = 2024,
+    url = {https://github.com/leanprover-community/mathlib4},
+    urldate = {2024-11-28},
+    note = {Revision: \\ 1109970b9069835cb9d4cd69bf196c9fff7516f4}
+}
+
+@online{FLT,
+    author = {Kevin Buzzard},
+    title = {The Fermat's Last Theorem Project},
+    year = 2024,
+    url = {https://leanprover-community.github.io/blog/posts/FLT-announcement/},
+    urldate = {2024-11-28},
+}
+
+@article{TheoryExploration,
+    author = {Buchberger, Bruno},
+    year = {2000},
+    month = {01},
+    pages = {9-32},
+    title = {Theory Exploration with Theorema},
+    volume = {XXXVIII},
+    journal = {Analele Universitatii Din Timisoara, Seria Matematica-Informatica},
+    doi={10.1016/j.jal.2005.10.006}
+}
+@book{Isabelle,
+  title={Isabelle/HOL: a proof assistant for higher-order logic},
+  author={Nipkow, Tobias and Wenzel, Markus and Paulson, Lawrence C},
+  year={2002},
+  publisher={Springer}
+}
+
+@inproceedings{Agda,
+  title={A brief overview of Agda--a functional language with dependent types},
+  author={Bove, Ana and Dybjer, Peter and Norell, Ulf},
+  booktitle={Theorem Proving in Higher Order Logics: 22nd International Conference, TPHOLs 2009, Munich, Germany, August 17-20, 2009. Proceedings 22},
+  pages={73--78},
+  year={2009},
+  organization={Springer}
+}
+
+@online{Coq,
+    author = {{The Coq Team}},
+    title = {The Coq Proof Assistant},
+    year = 2025,
+    url = {https://coq.inria.fr/},
+    urldate = {2025-03-10},
+}
+
+
+@online{LeanContrib,
+    author = {{Leanprover Community}},
+    title = {Mathlib statistics},
+    year = 2024,
+    url = {https://leanprover-community.github.io/mathlib_stats.html},
+    urldate = {2024-11-29},
+}
+
+@InProceedings{ProofSurvey,
+    author="Johansson, Moa",
+    editor="Kaliszyk, Cezary and Brady, Edwin and Kohlhase, Andrea and Sacerdoti Coen, Claudio",
+    title="Lemma Discovery for Induction",
+    booktitle="Intelligent Computer Mathematics",
+    year="2019",
+    publisher="Springer International Publishing",
+    address="Cham",
+    pages="125--139",
+    abstract="Automating proofs by induction can be challenging, not least because proofs might need auxiliary lemmas, which themselves need to be proved by induction. In this paper we survey various techniques for automating the discovery of such lemmas, including both top-down techniques attempting to generate a lemma from an ongoing proof attempt, as well as bottom-up theory exploration techniques trying to construct interesting lemmas about available functions and datatypes, thus constructing a richer background theory.",
+    isbn="978-3-030-23250-4"
+}
+
+@article{automath,
+  author       = {J Strother Moore and Claus{-}Peter Wirth},
+  title        = {Automation of Mathematical Induction as part of the History of Logic},
+  journal      = {CoRR},
+  volume       = {abs/1309.6226},
+  year         = {2013},
+  url          = {http://arxiv.org/abs/1309.6226},
+  eprinttype   = {arXiv},
+  eprint       = {1309.6226},
+  timestamp    = {Mon, 13 Aug 2018 16:48:44 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/MooreW13.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@online{EasyGADT,
+    title = {Easy GADTs by repeating yourself},
+    author = {Eduardo Rafael},
+    year = 2024,
+    url = {https://www.youtube.com/watch?v=-XYO_ILJG2M},
+    urldate = {2024-12-06}
+}
+
+@online{VampireSrc,
+    author = {{Vampire Team}},
+    title = {Vampire},
+    year = 2024,
+    url = {https://vprover.github.io/},
+    urldate = {2024-12-12}
+}
+
+@article{QuickCheck,
+    author = {Claessen, Koen and Hughes, John},
+    title = {QuickCheck: a lightweight tool for random testing of Haskell programs},
+    year = {2000},
+    issue_date = {Sept. 2000},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {35},
+    number = {9},
+    issn = {0362-1340},
+    doi = {10.1145/357766.351266},
+    abstract = {Quick Check is a tool which aids the Haskell programmer in formulating and testing properties of programs. Properties are described as Haskell functions, and can be automatically tested on random input, but it is also possible to define custom test data generators. We present a number of case studies, in which the tool was successfully used, and also point out some pitfalls to avoid. Random testing is especially suitable for functional programs because properties can be stated at a fine grain. When a function is built from separately tested components, then random testing suffices to obtain good coverage of the definition under test.},
+    journal = {SIGPLAN Not.},
+    month = sep,
+    pages = {268–279},
+    numpages = {12}
+}
+
+@online{QuickCheckArbitrary,
+    author = {{Typeable.io contributors}},
+    title = {generic-arbitrary: Generic implementation for QuickCheck's Arbitrary},
+    year = 2022,
+    url = {https://hackage.haskell.org/package/generic-arbitrary-1.0.1},
+    urldate = {2025-01-27}
+}
+
+@online{Lean4Export,
+    author = {Ullrich, Sebastian and Carneiro, Mario and Gadgil, Siddhartha},
+    title = {lean4export},
+    year = 2024,
+    url = {https://github.com/leanprover/lean4export},
+    urldate = {2025-02-10},
+    note = {Revision: \seqsplit{d7978498941853b4ff8003b058f66e2142d3a763}}
+}
+
+@online{ast-export,
+    author = {Mario Carneiro},
+    title = {ast\_export},
+    year = 2024,
+    url = {https://github.com/digama0/ast_export},
+    urldate = {2025-02-17},
+    note = {Revision: \seqsplit{48092798045976347e413cedd4e3ecb9c76f1141}}
+}
+
+@online{Hint,
+    author = {{The Hint Authors}},
+    title = {hint},
+    year = 2025,
+    url = {https://hackage.haskell.org/package/hint-0.9.0.8},
+    urldate = {2025-03-05}
+}
+
+@article{ProofAssistants,
+    author={Geuvers, H.},
+    title={Proof assistants: History, ideas and future},
+    journal={Sadhana},
+    year={2009},
+    month={Feb},
+    day={01},
+    volume={34},
+    number={1},
+    pages={3-25},
+    abstract={In this paper I will discuss the fundamental ideas behind proof assistants: What are they and what is a proof anyway? I give a short history of the main ideas, emphasizing the way they ensure the correctness of the mathematics formalized. I will also briefly discuss the places where proof assistants are used and how we envision their extended use in the future. While being an introduction into the world of proof assistants and the main issues behind them, this paper is also a position paper that pushes the further use of proof assistants. We believe that these systems will become the future of mathematics, where definitions, statements, computations and proofs are all available in a computerized form. An important application is and will be in computer supported modelling and verification of systems. But there is still a long road ahead and I will indicate what we believe is needed for the further proliferation of proof assistants.},
+    issn={0973-7677},
+    doi={10.1007/s12046-009-0001-5},
+}
+
+@article{MathReasoning,
+    title={Mathematical reasoning and the computer},
+    author={Buzzard, Kevin},
+    journal={Bulletin of the American Mathematical Society},
+    volume={61},
+    number={2},
+    pages={211--224},
+    year={2024},
+    doi={10.1090/bull/1833}
+}
+
+@online{Plausible,
+    author = {{Leanprover Community}},
+    title = {plausible},
+    year = 2025,
+    url = {https://reservoir.lean-lang.org/@leanprover-community/plausible},
+    urldate = {2025-03-17}
+}
+
+@inproceedings{TIP,
+    author = {Ros\'{e}n, Dan and Smallbone, Nicholas},
+    title = {TIP: Tools for Inductive Provers},
+    year = {2015},
+    isbn = {9783662488980},
+    publisher = {Springer-Verlag},
+    address = {Berlin, Heidelberg},
+    doi = {10.1007/978-3-662-48899-7_16},
+    abstract = {TIP is a toolbox for users and developers of inductive provers. It consists of a large number of tools which can, for example, simplify an inductive problem, monomorphise it or find counterexamples to it. We are using TIP to help maintain a set of benchmarks for inductive theorem provers, where its main job is to encode aspects of the problem that are not natively supported by the respective provers. TIP makes it easier to write inductive provers, by supplying necessary tools such as lemma discovery which prover authors can simply import into their own prover.},
+    booktitle = {Proceedings of the 20th International Conference on Logic for Programming, Artificial Intelligence, and Reasoning - Volume 9450},
+    pages = {219–232},
+    numpages = {14},
+    location = {Suva, Fiji},
+    series = {LPAR-20 2015}
+}
+@inproceedings{Beans,
+    author = {Ullrich, Sebastian and de Moura, Leonardo},
+    title = {Counting immutable beans: reference counting optimized for purely functional programming},
+    year = {2021},
+    isbn = {9781450375627},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    doi = {10.1145/3412932.3412935},
+    abstract = {Most functional languages rely on some kind of garbage collection for automatic memory management. They usually eschew reference counting in favor of a tracing garbage collector, which has less bookkeeping overhead at runtime. On the other hand, having an exact reference count of each value can enable optimizations such as destructive updates. We explore these optimization opportunities in the context of an eager, purely functional programming language. We propose a new mechanism for efficiently reclaiming memory used by nonshared values, reducing stress on the global memory allocator. We describe an approach for minimizing the number of reference counts updates using borrowed references and a heuristic for automatically inferring borrow annotations. We implemented all these techniques in a new compiler for an eager and purely functional programming language with support for multi-threading. Our preliminary experimental results demonstrate our approach is competitive and often outperforms state-of-the-art compilers.},
+    booktitle = {Proceedings of the 31st Symposium on Implementation and Application of Functional Languages},
+    articleno = {3},
+    numpages = {12},
+    keywords = {lean, purely functional programming, reference counting},
+    location = {Singapore, Singapore},
+    series = {IFL '19}
+}
+
+@mastersthesis{Hopster,
+    author  = "Juan Ricart",
+    title   = "Hopster: Automated discovery of mathematical properties in HOL",
+    school  = "Chalmers tekniska högskola",
+    year    = 2019,
+    url = {https://odr.chalmers.se/items/7dbaa0d9-97b7-468d-a16f-4e64507fb939}
+}
+
+@inproceedings{Aesop,
+    author = {Limperg, Jannis and From, Asta Halkj\ae{}r},
+    title = {Aesop: White-Box Best-First Proof Search for Lean},
+    year = {2023},
+    isbn = {9798400700262},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3573105.3575671},
+    doi = {10.1145/3573105.3575671},
+    abstract = {We present Aesop, a proof search tactic for the Lean 4 interactive   theorem prover. Aesop performs a tree-based search over a user-specified   set of proof rules. It supports safe and unsafe rules and uses a best-first   search strategy with customisable prioritisation. Aesop also allows users   to register custom normalisation rules and integrates Lean's simplifier to   support equational reasoning. Many details of Aesop's search procedure are   designed to make it a white-box proof automation tactic, meaning that users   should be able to easily predict how their rules will be applied, and thus how   powerful and fast their Aesop invocations will be.    Since we use a best-first search strategy, it is not obvious how to handle   metavariables which appear in multiple goals. The most common strategy for   dealing with metavariables relies on backtracking and is therefore not   suitable for best-first search. We give an algorithm which addresses this   issue. The algorithm works with any search strategy, is independent of the   underlying logic and makes few assumptions about how rules interact with   metavariables. We conjecture that with a fair search strategy, the algorithm   is as complete as the given set of rules allows.},
+    booktitle = {Proceedings of the 12th ACM SIGPLAN International Conference on Certified Programs and Proofs},
+    pages = {253–266},
+    numpages = {14},
+    keywords = {type theory, tactic, proof search, interactive theorem proving, deductive verification, Lean},
+    location = {Boston, MA, USA},
+    series = {CPP 2023}
+}
+
+@online{Elaborators,
+    author = {{leanprover}},
+    title = {The Lean Language Reference: Elaborators},
+    year = 2025,
+    url = {https://lean-lang.org/doc/reference/4.19.0-rc2/Notations-and-Macros/Elaborators/},
+    urldate = {2025-06-23}
+}
+
+@online{Declaration,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Lean.Declaration},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Lean/Declaration.html},
+    urldate = {2025-06-23}
+}
+
+@online{IR,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Lean.Compiler.IR.Basic},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Lean/Compiler/IR/Basic.html},
+    urldate = {2025-06-23}
+}
+
+@online{rfl,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Prelude},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#rfl},
+    urldate = {2025-06-30}
+}
+
+@online{Definitions,
+    author = {{leanprover}},
+    title = {The Lean Language Reference: Definitions},
+    year = 2025,
+    url = {https://lean-lang.org/doc/reference/4.19.0-rc2/Definitions/Definitions/},
+    urldate = {2025-07-01}
+}
+
+@article{PrecisionAndRecall,
+  title={Evaluation: from precision, recall and F-measure to ROC, informedness, markedness and correlation},
+  author={Powers, David MW},
+  journal={arXiv preprint arXiv:2010.16061},
+  year={2020}
+}
+
+@online{SimpLemmas,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.SimpLemmas},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/SimpLemmas.html#Bool.or_false},
+    urldate = {2025-08-20}
+}
+
+@online{Bool.And,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.Bool.and},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/Bool.html#and},
+    urldate = {2025-08-20}
+}
+
+@online{Bool.Or,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.Bool.or},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/Bool.html#or},
+    urldate = {2025-08-20}
+}
+
+@online{Bool.Dist,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.Bool.distributivity},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/Bool.html#distributivity},
+    urldate = {2025-08-20}
+}
+
+@online{Nat.add,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.Nat.Basic Nat.add theorems},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/Nat/Basic.html#Nat-add-theorems},
+    urldate = {2025-08-20}
+}
+
+@online{Nat.mul,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.Nat.Basic Nat.mul theorems},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/Nat/Basic.html#Nat-mul-theorems},
+    urldate = {2025-08-20}
+}
+
+@online{Lemmas.reverse,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.List.Lemmas reverse},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Lemmas.html#reverse},
+    urldate = {2025-08-20}
+}
+
+@online{List.append,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.List.Basic append},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#append},
+    urldate = {2025-08-20}
+}
+
+@online{List.reverse,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Init.Data.List.Basic reverse},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#reverse},
+    urldate = {2025-08-20}
+}
+
+@online{Tree,
+    author = {{Leanprover Community}},
+    title = {mathlib4 docs: Mathlib.Data.Tree.Basic Binary tree},
+    year = 2025,
+    url = {https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Tree/Basic.html#Binary-tree},
+    urldate = {2025-08-21}
+}

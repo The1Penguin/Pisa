@@ -1,0 +1,26 @@
+\vspace{-0.8cm}
+\begin{figure}[H]
+  \centering
+  \input{figure/overview.tikz}
+  \caption{An overview of the information flow of Pisa.}\label{fig:overview}
+\end{figure}
+\vspace{-0.3cm}
+
+Pisa is constructed by multiple distinct modules that will be explained in this chapter.
+An overview of how they interact can be seen in \cref{fig:overview}.
+
+A rundown of Pisa starts at the end user working with Lean as an ITP.
+They interact with Pisa by providing a set of definitions to explore through a macro within Lean.
+An optional size parameter can also be specified to control how large the generated terms may be when searching for conjectures.
+The given definitions, and all their transitive dependencies, are resolved and serialized by the exporter (Example can be seen in \cref{sec:lean-interface:exporter}).
+This information is then dispatched to an executable containing the remaining subsystems.
+Conjectures then replace the call site in the ITP upon request from the user by inserting the output of this executable.
+
+To produce conjectures the executable uses QuickSpec and RoughSpec.
+This first requires that the serialized Lean definitions are transformed into Haskell code.
+This is presented in \cref{sec:pisa-haskell:translation}.
+The generated Haskell code can then be run in an interpreter.
+This is utilized by QuickSpec and RoughSpec to generate a set of conjectures, that finally is transformed back into Lean syntax.
+
+Since the differences between the languages are non-trivial multiple approaches could be taken to solve the problem.
+Several are presented and discussed in \cref{sec:discussion:alternative-approaches}.

@@ -1,0 +1,27 @@
+\begin{frame}{Goal} % Pingu
+  Create a tool that propose conjectures for a set of existing definitions in Lean.
+
+  \vspace{1cm}
+
+  A focus on transpilation
+\end{frame}
+
+% This project, that we call Pisa, set out to try and accomplish a similar goal to that Hipster.
+% That is to say, introduce a conjecture generator to Lean based on user provided types and definitions.
+% To accomplish this, tooling of Haskell was used, since they had shown their potential with Hipster, and have since gotten more involved in the form of RoughSpec.
+% To utilize the tooling from Haskell, a source to source compilation of some form had to be done. So this is the part which we spent most of our time on.
+
+\begin{frame}[fragile]{Usage} % Pingu
+  A code action has been created that has the following syntax
+  \vspace{1cm}
+  \begin{LeanCode}
+    #pisa num? ident+
+  \end{LeanCode}
+\end{frame}
+
+% To begin, lets see how the tool is actually used by people.
+% We can see in the slide the code action that was introduced into Lean.
+% It shows how it can be used, and we will go through the details later.
+
+% SWITCH TO EMACS BUFFER HERE
+% Maybe write binary tree quickly and show new types quickly

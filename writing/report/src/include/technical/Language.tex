@@ -1,0 +1,26 @@
+\section{The supported subset of Lean}\label{sec:supported-subset-of-lean}
+Pisa tries to support most of Lean.
+However, there are some features that are not able to be translated with the current implementation.
+
+Enumerable and recursive data types are supported and functions utilizing them are able to be represented.
+Polymorphic data types are also representable, however, instantiating them with a type is not.
+This comes from the conversion to monomorphic representations, outlined in \cref{sec:pisa-haskell:translation}.
+
+Dependent types are not supported.
+The construction of values for these types hinders the implementation since the IR is able to handle certain aspects of dependent types, such as type level values in a constructor.
+But the types for functions would not be able to be converted as that would require dependent types in Haskell.
+
+Type classes is another aspect that could be difficult to represent.
+Depending on what the type class encodes, it could be doable, but that would require knowledge of what the intention about said type class is aiming to do.
+To implement type classes, one would either have to translate the definitions of the class, or implement specific versions of the common ones.
+Neither of these approaches were taken for this thesis.
+Further, a translation of the classes would also have to be supplied to the IR.
+
+Not supporting type classes means that §IO§ is not representable.
+Further, §IO§ utilizes a lot of opaque definitions.
+Opaque definitions are definitions that are not exposed to the kernel~\autocite{Definitions}.
+For §IO§ specifically, these functions are usually implemented by the runtime.
+
+Higher order functions are not able to be represented using the current implementation.
+By default, QuickCheck is able to generate functions for usage, which enables QuickSpec and RoughSpec to use higher order functions.
+With the current implementation of Pisa, this would require a layer between the generation of these functions, and their usage, in order to translate them into Lean IR.

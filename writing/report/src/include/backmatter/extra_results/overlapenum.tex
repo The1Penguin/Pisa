@@ -1,0 +1,137 @@
+\section{Precision and recall analysis for Enumerated types}\label{app:overlapenum}
+
+\paragraph*{True positives are the following (paired between generated and mathlib version):}
+
+\begin{multicols}{2}
+\begin{itemize}[noitemsep]
+    \item \cref{overlapenum:not_false1,overlapenum:not_false2}
+    \item \cref{overlapenum:not_true1,overlapenum:not_true2}
+    \item \cref{overlapenum:and_comm1,overlapenum:and_comm2}
+    \item \cref{overlapenum:and_self1,overlapenum:and_self2}
+    \item \cref{overlapenum:or_comm1,overlapenum:or_comm2}
+    \item \cref{overlapenum:or_self1,overlapenum:or_self2}
+    \item \cref{overlapenum:and_false1,overlapenum:and_false2}
+    \item \cref{overlapenum:and_true1,overlapenum:and_true2}
+    \item \cref{overlapenum:or_false1,overlapenum:or_false2}
+    \item \cref{overlapenum:or_true1,overlapenum:or_true2}
+    \item \cref{overlapenum:not_not1,overlapenum:not_not2}
+    \item \cref{overlapenum:and_not_self1,overlapenum:and_not_self2}
+    \item \cref{overlapenum:or_not_self1,overlapenum:or_not_self2}
+    \item \cref{overlapenum:and_left_comm1,overlapenum:and_left_comm2}
+    \item \cref{overlapenum:or_left_comm1,overlapenum:or_left_comm2}
+    \item \cref{overlapenum:not_or1,overlapenum:not_or2}
+    \item \cref{overlapenum:or_and_distrib_left1,overlapenum:or_and_distrib_left2}
+    \item \cref{overlapenum:true_and1,overlapenum:true_and2}
+    \item \cref{overlapenum:false_or1,overlapenum:false_or2}
+    \item \cref{overlapenum:not_and1,overlapenum:not_and2}
+    \item \cref{overlapenum:and_assoc1,overlapenum:and_assoc2}
+    \item \cref{overlapenum:or_assoc1,overlapenum:or_assoc2}
+\end{itemize}
+\end{multicols}
+\vspace{-0.2cm}
+
+\paragraph*{False positives are the following (generated but not in mathlib):}
+
+\begin{multicols}{2}
+\begin{itemize}[noitemsep]
+    \item \cref{overlapenum:false_positive1}
+    \item \cref{overlapenum:false_positive2}
+    \item \cref{overlapenum:false_positive3}
+\end{itemize}
+\end{multicols}
+\vspace{-0.2cm}
+
+\paragraph*{False negative are the following (in mathlib but not generated):}
+
+\begin{multicols}{2}
+\begin{itemize}[noitemsep]
+    \item \cref{overlapenum:false_negative1}
+    \item \cref{overlapenum:false_negative2}
+    \item \cref{overlapenum:false_negative3}
+    \item \cref{overlapenum:false_negative4}
+    \item \cref{overlapenum:false_negative5}
+    \item \cref{overlapenum:false_negative6}
+    \item \cref{overlapenum:false_negative7}
+    \item \cref{overlapenum:false_negative8}
+    \item \cref{overlapenum:false_negative9}
+    \item \cref{overlapenum:false_negative10}
+    \item \cref{overlapenum:false_negative11}
+    \item \cref{overlapenum:false_negative12}
+    \item \cref{overlapenum:false_negative13}
+\end{itemize}
+\end{multicols}
+\vspace{-0.2cm}
+
+\begin{conjectureset}[H]
+\begin{align}
+§not§\ §false§ &= §true§ \label{overlapenum:not_false1} \\
+§not§\ §true§ &= §false§ \label{overlapenum:not_true1}\\
+\forall x\ y : \mathbb{B}.\ §and§\ x\ y &= §and§\ y\ x \label{overlapenum:and_comm1}\\
+\forall x : \mathbb{B}.\ §and§\ x\ x &= x \label{overlapenum:and_self1}\\
+\forall x\ y : \mathbb{B}.\ §or§\ x\ y &= §or§\ y\ x \label{overlapenum:or_comm1}\\
+\forall x : \mathbb{B}.\ §or§\ x\ x &= x \label{overlapenum:or_self1}\\
+\forall x : \mathbb{B}.\ §and§\ x\ §false§ &= §false§ \label{overlapenum:and_false1}\\
+\forall x : \mathbb{B}.\ §and§\ x\ §true§ &= x \label{overlapenum:and_true1}\\
+\forall x : \mathbb{B}.\ §or§\ x\ §false§ &= x \label{overlapenum:or_false1}\\
+\forall x : \mathbb{B}.\ §or§\ x\ §true§ &= §true§ \label{overlapenum:or_true1}\\
+\forall x : \mathbb{B}.\ §not§\ (§not§\ x) &= x \label{overlapenum:not_not1}\\
+\forall x : \mathbb{B}.\ §and§\ x\ (§not§\ x) &= §false§ \label{overlapenum:and_not_self1}\\
+\forall x : \mathbb{B}.\ §or§\ x\ (§not§\ x) &= §true§ \label{overlapenum:or_not_self1}\\
+\forall x\ y\ z : \mathbb{B}.\ §and§\ x\ (§and§\ y\ z) &= §and§\ y\ (§and§\ x\ z) \label{overlapenum:and_left_comm1}\\
+\forall x\ y : \mathbb{B}.\ §and§\ x\ (§or§\ x\ y) &= x \label{overlapenum:false_positive1}\\
+\forall x\ y : \mathbb{B}.\ §or§\ x\ (§and§\ x\ y) &= x \label{overlapenum:false_positive2}\\
+\forall x\ y\ z : \mathbb{B}.\ §or§\ x\ (§or§\ y\ z) &= §or§\ y\ (§or§\ x\ z) \label{overlapenum:or_left_comm1}\\
+\forall x\ y : \mathbb{B}.\ §and§\ (§not§\ x)\ (§not§\ y) &= §not§\ (§or§\ x\ y) \label{overlapenum:not_or1}\\
+\forall x\ y : \mathbb{B}.\ §and§\ (§not§\ x)\ (§or§\ x\ y) &= §and§\ y\ (§not§\ x) \label{overlapenum:false_positive3}\\
+\forall x\ y\ z : \mathbb{B}.\ §and§\ (§or§\ x\ y)\ (§or§\ x\ z) &= §or§\ x\ (§and§\ y\ z) \label{overlapenum:or_and_distrib_left1}\\
+\forall x : \mathbb{B}.\ §and§\ §true§\ x &= x \label{overlapenum:true_and1}\\
+\forall x : \mathbb{B}.\ §or§\ §false§\ x &= x \label{overlapenum:false_or1}\\
+\forall x\ y : \mathbb{B}.\ §or§\ (§not§\ x)\ (§not§\ y) &= §not§\ (§and§\ x\ y) \label{overlapenum:not_and1}\\
+\forall x\ y\ z : \mathbb{B}.\ §and§\ (§and§\ x\ y)\ z &= §and§\ x\ (§and§\ y\ z) \label{overlapenum:and_assoc1}\\
+\forall x\ y\ z : \mathbb{B}.\ §or§\ (§or§\ x\ y)\ z &= §or§\ x\ (§or§\ y\ z) \label{overlapenum:or_assoc1}
+\end{align}
+\vspace{-0.9cm}
+\caption{Generated by Pisa for the domain $\mathbb{B}$ for comparison to mathlib.}\label{eqs:enum:compare}
+\end{conjectureset}
+
+\begin{conjectureset}[H]
+\begin{align}
+(!§false§) &= §true§\ \label{overlapenum:not_false2}\\
+(!§true§) &= §false§\ \label{overlapenum:not_true2}\\
+\forall x\ y : \mathbb{B}.\ (x\ \&\&\ y) &= (y\ \&\&\ x)\ \label{overlapenum:and_comm2}\\
+\forall b : \mathbb{B}.\ (b\ \&\&\ b) &= b\ \label{overlapenum:and_self2}\\
+\forall x\ y : \mathbb{B}.\ (x\ ||\ y) &= (y\ ||\ x)\ \label{overlapenum:or_comm2}\\
+\forall b : \mathbb{B}.\ (b\ ||\ b) &= b\ \label{overlapenum:or_self2}\\
+\forall b : \mathbb{B}.\ (b\ \&\&\ §false§) &= §false§\ \label{overlapenum:and_false2}\\
+\forall b : \mathbb{B}.\ (b\ \&\&\ §true§) &= b\ \label{overlapenum:and_true2}\\
+\forall b : \mathbb{B}.\ (b\ ||\ §false§) &= b\ \label{overlapenum:or_false2}\\
+\forall b : \mathbb{B}.\ (b\ ||\ §true§) &= §true§\ \label{overlapenum:or_true2}\\
+\forall b : \mathbb{B}.\ (!!b) &= b\ \label{overlapenum:not_not2}\\
+\forall x : \mathbb{B}.\ (x\ \&\&\ !x) &= §false§\ \label{overlapenum:and_not_self2}\\
+\forall x : \mathbb{B}.\ (x\ ||\ !x) &= §true§\ \label{overlapenum:or_not_self2}\\
+\forall x\ y\ z : \mathbb{B}.\ (x\ \&\&\ (y\ \&\&\ z)) &= (y\ \&\&\ (x\ \&\&\ z))\ \label{overlapenum:and_left_comm2}\\
+\forall x\ y\ z : \mathbb{B}.\ (x\ ||\ (y\ ||\ z)) &= (y\ ||\ (x\ ||\ z))\ \label{overlapenum:or_left_comm2}\\
+\forall x\ y : \mathbb{B}.\ (!(x\ ||\ y)) &= (!x\ \&\&\ !y)\ \label{overlapenum:not_or2}\\
+\forall x\ y\ z : \mathbb{B}.\ (x\ ||\ y\ \&\&\ z) &= ((x\ ||\ y)\ \&\&\ (x\ ||\ z))\ \label{overlapenum:or_and_distrib_left2}\\
+\forall b : \mathbb{B}.\ (§true§\ \&\&\ b) &= b\ \label{overlapenum:true_and2}\\
+\forall b : \mathbb{B}.\ (§false§\ ||\ b) &= b\ \label{overlapenum:false_or2}\\
+\forall x\ y : \mathbb{B}.\ (!(x\ \&\&\ y)) &= (!x\ ||\ !y)\ \label{overlapenum:not_and2}\\
+\forall a\ b\ c : \mathbb{B}.\ (a\ \&\&\ b\ \&\&\ c) &= (a\ \&\&\ (b\ \&\&\ c))\ \label{overlapenum:and_assoc2}\\
+\forall a\ b\ c : \mathbb{B}.\ (a\ ||\ b\ ||\ c) &= (a\ ||\ (b\ ||\ c))\ \label{overlapenum:or_assoc2}\\
+\forall b : \mathbb{B}.\ (§true§\ ||\ b) &= §true§\ \label{overlapenum:false_negative1}\\
+\forall b : \mathbb{B}.\ (§false§\ \&\&\ b) &= §false§\ \label{overlapenum:false_negative2}\\
+\forall a\ b : \mathbb{B}.\ (a\ \&\&\ (a\ \&\&\ b)) &= (a\ \&\&\ b)\ \label{overlapenum:false_negative3}\\
+\forall a\ b : \mathbb{B}.\ ((a\ \&\&\ b)\ \&\&\ b) &= (a\ \&\&\ b)\ \label{overlapenum:false_negative4}\\
+\forall x : \mathbb{B}.\ (!x\ \&\&\ x) &= §false§\ \label{overlapenum:false_negative5}\\
+\forall x\ y\ z : \mathbb{B}.\ ((x\ \&\&\ y)\ \&\&\ z) &= ((x\ \&\&\ z)\ \&\&\ y)\ \label{overlapenum:false_negative6}\\
+\forall a\ b : \mathbb{B}.\ (a\ ||\ (a\ ||\ b)) &= (a\ ||\ b)\ \label{overlapenum:false_negative7}\\
+\forall a\ b : \mathbb{B}.\ ((a\ ||\ b)\ ||\ b) &= (a\ ||\ b)\ \label{overlapenum:false_negative8}\\
+\forall x : \mathbb{B}.\ (!x\ ||\ x) &= §true§\ \label{overlapenum:false_negative9}\\
+\forall x\ y\ z : \mathbb{B}.\ ((x\ ||\ y)\ ||\ z) &= ((x\ ||\ z)\ ||\ y)\ \label{overlapenum:false_negative10}\\
+\forall x\ y\ z : \mathbb{B}.\ (x\ \&\&\ (y\ ||\ z)) &= (x\ \&\&\ y\ ||\ x\ \&\&\ z)\ \label{overlapenum:false_negative11}\\
+\forall x\ y\ z : \mathbb{B}.\ ((x\ ||\ y)\ \&\&\ z) &= (x\ \&\&\ z\ ||\ y\ \&\&\ z)\ \label{overlapenum:false_negative12}\\
+\forall x\ y\ z : \mathbb{B}.\ (x\ \&\&\ y\ ||\ z) &= ((x\ ||\ z)\ \&\&\ (y\ ||\ z)) \label{overlapenum:false_negative13}
+\end{align}
+\vspace{-0.9cm}
+\caption{Mathlib equivalent for the domain $\mathbb{B}$ for comparison.}\label{eqs:mathlib_enum:compare}
+\end{conjectureset}

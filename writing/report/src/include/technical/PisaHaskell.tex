@@ -1,0 +1,188 @@
+\section{Haskell interface}\label{sec:pisa-haskell}
+The Haskell interface will, with the output from the Lean interface (see \cref{sec:lean-interface}), generate conjectures.
+It goes through several steps to achieve this described below.
+
+\subsection{Translation}\label{sec:pisa-haskell:translation}
+In order for the translation to hold a renaming of functions and data types need to occur due to Haskell being a more restrictive language.
+This means that the Haskell interface requires a mapping between the Haskell name and the Lean name.
+When a root is translated, they are added to a list of signatures with their Lean name instead of their Haskell counterpart.
+These signatures are then used in \cref{sec:pisa-haskell:interpretation}.
+However, the names of types are not able to be retained in this way, and are instead handled by the method explained in \cref{sec:pisa-haskell:reverse-translation}.
+
+A key distinction between Lean and Haskell relates to dependent types.
+In Haskell types and values are two separate domains whereas types are values in Lean.
+To handle this aspect, a translation of data types and the type information was implemented together with an interpreter for the function bodies.
+
+Translation of the data types is straightforward.
+Each data type has a set of constructors which are translated into their equivalent Haskell version.
+However, there are certain aspects that need to be handled in order to allow for QuickSpec and RoughSpec to be utilized.
+First is ensuring that the data types do not have type variables.
+Usually, one would utilize the data types \haskell{A} ... \haskell{E} to symbolize polymorphic aspects, but due to the need for an interpreter for the function bodies, a separate type known as \haskell{Poly} was introduced.
+\haskell{Poly} replaces each occurrence of polymorphism in the constructor and types of functions.
+The reason that the data types are kept at this level and not directly done for the intermediate representation is to be able to autogenerate them through QuickCheck, and ensuring invariants.
+
+For the interpreter the intermediate representation from \cref{sec:lean:intermediate-representation} is used as the base language.
+There are particular aspects of this IR that one can ignore in the information sent by the exporter from \cref{sec:lean-interface:exporter}, since the exported code is not yet fully optimized.
+
+The type signature in \cref{lst:interp} is the one for the interpreter.
+\haskell{Decl} is the declaration used for evaluation, and the \haskell{Map} is the scope of other declarations that might be used in the body of the function.
+The list of \haskell{Val} is the arguments for the function.
+For this to work with QuickSpec, §[Val]§ needs to contain values that conform to the expected shape of objects, that the function uses.
+
+\begin{listing}[H]
+\begin{HaskellCode}
+eval :: Decl -> Map Name Decl -> [Val] -> Val
+\end{HaskellCode}
+\caption{Type signature of the interpreter function, called §eval§.}
+\label{lst:interp}
+\end{listing}
+
+\vspace{-0.7cm}
+
+\haskell{Val} is the values in the IR language, and therefore the data type definitions previously mentioned need to be able to be converted.
+This is done by creating two functions, one from and one to §Val§ for each type.
+Each input to the function can be converted for use in the interpreter using §toVal§, and §fromVal§ can be used after the computation.
+An example of how this is done can be seen from the Lean definition in \cref{lst:polyLean} to the Haskell version in \cref{lst:poly}.
+
+Another aspect that needs accommodation is how the IR expects values to be placed in constructors.
+One would expect that the values would be mapped in the same order as the types in the constructor.
+However, that is not the case.
+Instead the values of a type that is an enum, that is to say one that can be encoded as a unsigned integer, will appear before the other values that are not of an enum type.
+This means that a little fix in the from and to \haskell{Val} needed to be implemented to handle this.
+
+\begin{listing}[H]
+\begin{LeanCode}
+inductive L (α : Type u) where
+  | Nil : L α
+  | Cons : α → L α → L α
+\end{LeanCode}
+\caption{Lists data type written in Lean.}
+\label{lst:polyLean}
+\end{listing}
+
+\vspace{-0.55cm}
+
+\begin{listing}[H]
+\begin{HaskellCode}
+newtype Poly = Poly Natural
+
+fromValPoly :: Val -> Poly
+fromValPoly (Unsigned a) = Poly a
+
+toValPoly :: Poly -> Val
+toValPoly (Poly a) = Unsigned a
+
+data L where
+  Nil :: L
+  Cons :: Poly -> L -> L
+
+toValL :: L -> Val
+toValL Nil        = VCtor (Object 1 0) []
+toValL (Cons b c) = VCtor (Object 1 1) [toValPoly b, toValL c]
+
+fromValL :: Val -> L
+fromValL (VCtor (Object _ 0) [])    = Nil
+fromValL (VCtor (Object _ 1) [b, c] = Cons (fromValPoly b) (fromValL c)
+\end{HaskellCode}
+\caption[\cref{lst:polyLean} as converted into Haskell.]{
+  \cref{lst:polyLean} as converted into Haskell, using the §Poly§ type.
+  This includes the functions to transformation to and from values for the IR interpreter.
+}
+\label{lst:poly}
+\end{listing}
+
+\vspace{-0.93cm}
+\subsection{Interpretation of Haskell}\label{sec:pisa-haskell:interpretation}
+With the translation to Haskell code, as outlined in \cref{sec:pisa-haskell:translation}, one can utilize the library ``hint''~\autocite{Hint} to run the definitions and generate values.
+``hint'' an interpreter for Haskell, built upon GHC's API.
+This allows Pisa to run the autogenerated code to fetch the signatures generated.
+The process above is similar to the tool ``tip-spec'' from \citetitle{TIP} by~\cite{TIP}.
+
+\subsection{Conjecture generation}\label{sec:pisa-haskell:conjecture-generation}
+QuickSpec is able to be run with a list of names and associated functions.
+In addition to the list, a max term size is given by the end user.
+Then, with the output of this as background, RoughSpec is called.
+It uses the general templates mentioned in \cref{sec:quickspec:roughspec}, to run through the same definitions.
+This will output a list of properties, in which the terms will use names from the translation.
+This is same approach that \citeauthor{Roughspec} did, in their hybrid approach, as explained in \cref{sec:quickspec:roughspec}.
+
+One noteworthy aspect is that the functions the end user is interested in can be renamed in signatures generated for QuickSpec and RoughSpec.
+This allows Pisa to use the Lean naming, which is less strict than Haskell.
+The function names were converted to an acceptable Haskell version in the translation step, and the Lean counterpart used in the signature, as explained in \cref{sec:pisa-haskell:translation}.
+
+\subsection{Reverse translation}\label{sec:pisa-haskell:reverse-translation}
+Reverse translation is needed for the data types used to regain their Lean names instead of their Haskell counterparts.
+Further, reverse translations are needed when there is an implicit argument, such as in the case for \haskell{Nil} in the case of lists.
+The names of the functions that the theory is being explored on can be retained by other means, as mentioned in \cref{sec:pisa-haskell:translation}.
+
+To allow the user to easily use the generated conjectures, the names have to be reverted into the form they have in Lean.
+Throughout the process of translation, seen in \cref{sec:pisa-haskell:translation}, a mapping between Haskell and Lean names are kept.
+This is, in this step, inverted.
+This allows a reversal of translation, meaning a translation from Haskell into their Lean counterpart.
+Further, this is then converted into theorems that are able to be copied into Lean code to start the proof aspect of these conjectures.
+
+\subsection{Example}\label{sec:pisa-haskell:example}
+As an example of what the different stages do, \lean{N} and \lean{add} will be used, assuming the definitions are exported and present.
+\begin{steps}[noitemsep]
+  \item Translate the definitions, it should look similar to \cref{lst:Pisa:ExampleOutput}.
+  \item Export the translation from step 1 to a Haskell file.
+  \item Interpret the Haskell file to retrieve the signatures.
+  \item Use QuickSpec and RoughSpec on the signatures to generate ``laws'' (conjectures), the conjectures generated in this example can be seen in \cref{lst:Pisa:QuickSpec}.
+  \item Reverse translate the ``laws'', creating the Lean version of these conjectures, as can be seen in \cref{lst:Pisa:LeanVersion}.\footnote{It will actually be in a JSON format, that Lean then can import.}
+\end{steps}
+
+\begin{listing}[H]
+\begin{HaskellCode}
+environment :: Map Name Decl
+environment = fromList [*\truncated*]
+
+data N where
+  Z :: N
+  S :: N -> N
+
+toValN :: N -> Val
+toValN Z = VCtor (Object 1 0) []
+toValN (S b) = VCtor (Object 1 1) [toValN b]
+
+fromValN :: Val -> N
+fromValN (VCtor (Object _ 0) [ ]) = Z
+fromValN (VCtor (Object _ 1) [b]) = S (fromValN b)
+
+add = FDecl {f = "Examples.Nat.add", *\truncated*}
+
+signatures :: [Sig]
+signatures =
+  [ monoType (Proxy :: Proxy N)
+  , con "add" (\a b -> fromValN (eval add environment
+                                [ toValN a, toValN b ]))
+  ]
+\end{HaskellCode}
+\caption
+  [Example of auto-generated code based on §N§ and §add§.]
+  {Example of auto-generated code based on §N§ and §add§. It has been simplified be more readable.}
+\label{lst:Pisa:ExampleOutput}
+\end{listing}
+
+
+\begin{listing}[H]
+\begin{minted}[frame=single, autogobble, fontsize=\small]{fancy}
+== Laws ==
+  1. add x y = add y x
+  2. add (add x y) z = add x (add y z)
+\end{minted}
+\caption
+  [Output from running QuickSpec and RoughSpec on \cref{lst:Pisa:ExampleOutput}.]
+  {Output from running QuickSpec and RoughSpec on §signatures§ from \cref{lst:Pisa:ExampleOutput}.}
+\label{lst:Pisa:QuickSpec}
+\end{listing}
+
+\begin{listing}[H]
+\begin{LeanCode}
+theorem conjecture0 (x y : N) :
+  add x y = add y x := sorry
+theorem conjecture1 (x y z : N) :
+  add (add x y) z = add x (add y z) := sorry
+\end{LeanCode}
+\caption {Lean translation of \cref{lst:Pisa:QuickSpec}.}
+\label{lst:Pisa:LeanVersion}
+\end{listing}

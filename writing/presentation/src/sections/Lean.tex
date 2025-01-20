@@ -1,0 +1,274 @@
+% ~ 5 min
+% An important piece of the puzzle is that Lean is very extensible.
+% We can define new arbitrary syntax and then provide a function that elaborates its semantics.
+% So here we see the keyword to do just that.
+% We define a new elaborator for a command, which is basically the top level object in Lean files.
+% ~~~~~~~~~~
+% The syntax is defined to be the literal character sequence hash pisa.
+% Followed by an optional number and a list of one or more identifiers.
+% I've omited the elaboration definition for brevity
+% ~~~~~~~~~~
+% What we instead are interested in is the ability to associate a language server code action with our command.
+% We can add an attribute to a CommandCodeAction definition to do this.
+% As seen here
+% ~~~~~~~~~~
+% The function can then return any language server protocol message
+% In this case we can provide a quickfix suggestion that lets the user insert the conjectures we generate.
+% As you just saw in the demo.
+% But to generate those we need more information.
+% ~~~~~~~~~~
+% This is provided by arguments to the code action.
+% Specifically the snapshot contains the state of the Lean evaluator at this point in time.
+% And the node is our syntax node, where we can obtain the number and identifiers
+% ~~~~~~~~~~
+% That information is sufficient for our exporter.
+% The following is an example definition of a Boolean type
+% And functions representing disjunctinos of two and three Boolean values respectively.
+% Lastly an invocation of our macro.
+% ~~~~~~~~~~
+% However, the namespacing is an important detail here
+% Within it the definitions are implicitly prefixed
+% But writing the full names get rather wordy.
+% When generating conjectures we want to preserve the provided identifiers.
+% ~~~~~~~~~~
+% Therefore the header of our export constitute a maping between fully qualified identifiers and the ones provided.
+% Aditionally, this informs the conjecture generator what definitions were provided.
+% ~~~~~~~~~~
+% This is relevant as they likely are not the only definitions exported.
+% As in this example where or3 is defined through the regular or.
+% When translating the code, the former will not work without also exporting the latter.
+% However, we don't want to provide conjectures involving all transitive definitions.
+% ~~~~~~~~~~
+% As previously mentioned we can retrive definitions from the snapshot given to the code action.
+% This expression would be resolving the definition of or3
+% ~~~~~~~~~~
+% The result looks something like this.
+% The details are not important here.
+% But we can see references to the `or` function
+% Practically all definitions in Lean are available as typed lambda expressions similar to this one.
+% For the provided identifiers and all their transitive dependencies to be exported
+% we serialize these expressions along with some additional information to JSON
+
+
+\begin{frame}[fragile]{Macro} % Kiren
+  \frametitle<1-2>{Macro: Definition}
+  \frametitle<3->{Macro: Code Action}
+
+  \begin{overprint}
+  \onslide<1>
+    \begin{LeanCodeHL}
+      ˹‹˺elab˹›˺ "#pisa" n:(num)? is:(ident)+ ˹‹˺: command˹›˺ => ˹$…$˺
+    \end{LeanCodeHL}
+  \onslide<2>
+    \begin{LeanCodeHL}
+      elab ˹‹˺"#pisa" n:(num)? is:(ident)+˹›˺ : command => ˹$…$˺
+    \end{LeanCodeHL}
+  \onslide<3->
+    \begin{LeanCodeHL}
+      elab "#pisa" n:(num)? is:(ident)+ : command => ˹$…$˺
+    \end{LeanCodeHL}
+  \end{overprint}
+
+  \begin{overprint}
+    \onslide<3>
+    \begin{LeanCodeHL}
+      ˹‹˺@[command_code_action «#pisa»]˹›˺
+      def insertConjectures : ˹‹˺CommandCodeAction˹›˺ :=
+    \end{LeanCodeHL}
+
+    \onslide<4->
+    \begin{LeanCodeHL}
+      @[command_code_action «#pisa»]
+      def insertConjectures : CommandCodeAction :=
+    \end{LeanCodeHL}
+  \end{overprint}
+
+
+  \begin{overprint}
+    \onslide<4>
+    \begin{LeanCodeHL}
+      ˹˺  λ _ snapshot _ node => do
+          ˹$…$˺
+          return {
+            ˹‹˺title := "Insert conjectures"˹›˺,
+            ˹‹˺kind? := "quickfix"˹›˺,
+            ˹‹˺edit? :=˹›˺ some <| .ofTextDocumentEdit {
+              textDocument := ⟨uri, none⟩
+              edits := #[ {
+                range := text.utf8RangeToLspRange range,
+                ˹‹˺newText := conjecturesText˹›˺,
+              } ],
+            }
+          }
+    \end{LeanCodeHL}
+
+    \onslide<5>
+    \begin{LeanCodeHL}
+      ˹‹˺  λ _ snapshot _ node =>˹›˺ do
+          ˹$…$˺
+          return {
+            title := "Insert conjectures",
+            kind? := "quickfix",
+            edit? := some <| .ofTextDocumentEdit {
+              textDocument := ⟨uri, none⟩
+              edits := #[ {
+                range := text.utf8RangeToLspRange range,
+                newText := conjecturesText
+              } ]
+            }
+          }
+    \end{LeanCodeHL}
+  \end{overprint}
+\end{frame}
+
+\begin{frame}[fragile]{Exporter} % Kiren
+  \frametitle<1>{Exporter: Example Code}
+  \frametitle<2>{Exporter: Namespaces}
+  \frametitle<3>{Exporter: Headers}
+  \frametitle<4->{Exporter: Resolving definitions}
+
+  \begin{overprint}
+    \onslide<1,4->
+      \begin{LeanCodeHL}
+        ˹‹˺namespace ˹\tikzmark{exstrt}˺Example˹\tikzmark{exend}˺
+        inductive B where | t : B | f : B
+        def or˹\tikzmark{ordef}˺ : B → B → B := λ
+          | .t, _ => .t
+          | .f, b => b
+
+        def or3˹\tikzmark{3def}˺ (a b c : B) : B := ˹\tikzmark{orref}˺or (or a b) c
+      \end{LeanCodeHL}
+    \onslide<2>
+      \begin{LeanCodeHL}
+        namespace ˹\tikzmark{exstrt}˺Example˹\tikzmark{exend}˺
+        ˹‹˺inductive ˹›˺Example.˹‹˺B where | t : B | f : B
+        def ˹›˺Example.˹‹˺or : B → B → B := λ
+          | .t, _ => .t
+          | .f, b => b
+
+        def ˹›˺Example.˹‹˺or3 (a b c : B) : B := or (or a b) c
+      \end{LeanCodeHL}
+    \onslide<3>
+      % \begin{minted}[escapeinside=˹˺,autogobble]{bash}
+      %   pisa --size 4
+      % \end{minted}
+      \begin{JsonCode}
+        [ ["Example.B", "B"]
+        , ["Example.B.t", "B.t"]
+        , ["Example.or3", "or3"]
+        ]
+      \end{JsonCode}
+  \end{overprint}
+  \begin{overprint}
+    \onslide<1,4->
+      \begin{LeanCodeHL}
+        ˹‹˺#pisa 4 B B.t ˹\tikzmark{3ref}˺or3
+      \end{LeanCodeHL}
+    \onslide<2-3>
+      \begin{LeanCodeHL}
+        ˹‹˺#pisa 4 ˹›˺Example.˹‹˺B ˹›˺Example.˹‹˺B.t ˹›˺Example.˹‹˺or3
+      \end{LeanCodeHL}
+  \end{overprint}
+
+  \begin{overprint}
+    \onslide<5>
+      \rule{\linewidth}{0.4pt}
+
+      \begin{LeanCode}[frame=none, fontsize=\normalsize]
+        snapshot.cmdState.env.find? `Example.or3
+      \end{LeanCode}
+  \end{overprint}
+
+  \begin{overprint}
+    \onslide<4->
+    \begin{tikzpicture}[overlay, remember picture, very thick, red!60, ->, >={Stealth[sep]}]
+      \draw ([yshift=0.5em]pic cs:orref) -- (pic cs:ordef);
+      \draw ([yshift=0.5em]pic cs:3ref) -- (pic cs:3def);
+    \end{tikzpicture}
+
+    \onslide<2>
+    \begin{tikzpicture}[overlay, remember picture, >={Stealth[sep]}]
+      \draw[blue!60,decorate,decoration={snake,amplitude=.1ex,segment length=.4ex}] ([yshift=-.5ex]pic cs:exstrt)--([yshift=-.5ex]pic cs:exend);
+    \end{tikzpicture}
+  \end{overprint}
+  % \begin{itemize}
+  %   \item Fetch dependencies of roots
+  %   \item Convert to JSON
+  % \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exporter: ConstantInfo} % Kiren
+  \begin{LeanCode}[frame=none]
+    ConstantInfo.defnInfo {
+      value := mkLambda `a .default (.const `Example.B [])
+            <| mkLambda `b .default (.const `Example.B [])
+            <| mkLambda `c .default (.const `Example.B [])
+            <| .app (.app (.const ˹\tikzmark{mstrt}˺`Example.or˹\tikzmark{mend}˺ [])
+                (.app (.app (.const `Example.or [])
+                  (.bvar 2)) (.bvar 1)))
+                (.bvar 0),
+      type := mkForall `a .default (.const `Example.B [])
+           <| mkForall `b .default (.const `Example.B [])
+           <| mkForall `c .default (.const `Example.B [])
+           <| .const `Example.B [],
+      safety := .safe
+      name := `Example.or3,
+      levelParams := [],
+      hints := .regular 2,
+      all := [`Example.or3],
+    }
+  \end{LeanCode}
+  \begin{tikzpicture}[overlay, remember picture, >={Stealth[sep]}]
+    \draw[blue!60,decorate,decoration={snake,amplitude=.1ex,segment length=.4ex}] ([yshift=-.5ex]pic cs:mstrt)--([yshift=-.5ex]pic cs:mend);
+  \end{tikzpicture}
+\end{frame}
+
+% {"defnInfo":
+%  {"val":
+%   {"value":
+%    {"lam":
+%     {"body":
+%      {"lam":
+%       {"body":
+%        {"lam":
+%         {"body":
+%          {"app":
+%           {"fn":
+%            {"app":
+%             {"fn": {"const": {"us": [], "declName": "Example.or"}},
+%              "arg":
+%              {"app":
+%               {"fn":
+%                {"app": {"fn": {"const": {"us": [], "declName": "Example.or"}}, "arg": {"bvar": {"deBruijnIndex": 2}}}},
+%                "arg": {"bvar": {"deBruijnIndex": 1}}}}}},
+%            "arg": {"bvar": {"deBruijnIndex": 0}}}},
+%          "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%          "binderName": "c",
+%          "binderInfo": "default"}},
+%        "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%        "binderName": "b",
+%        "binderInfo": "default"}},
+%      "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%      "binderName": "a",
+%      "binderInfo": "default"}},
+%    "type":
+%    {"forallE":
+%     {"body":
+%      {"forallE":
+%       {"body":
+%        {"forallE":
+%         {"body": {"const": {"us": [], "declName": "Example.B"}},
+%          "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%          "binderName": "c",
+%          "binderInfo": "default"}},
+%        "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%        "binderName": "b",
+%        "binderInfo": "default"}},
+%      "binderType": {"const": {"us": [], "declName": "Example.B"}},
+%      "binderName": "a",
+%      "binderInfo": "default"}},
+%    "safety": "safe",
+%    "name": "Example.or3",
+%    "levelParams": [],
+%    "hints": {"regular": 2},
+%    "all": ["Example.or3"]}}}

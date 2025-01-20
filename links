@@ -1,0 +1,14 @@
+https://github.com/ammkrn/lean4export/tree/format2024
+Fork of a lean exporter with a BNFC style for parsing said format
+
+https://github.com/digama0/ast_export
+AST export of lean
+
+https://github.com/frenzymath/jixia
+A static analysis tool for lean
+
+https://github.com/tip-org/tools/blob/master/tip-spec/src/Tip/QuickSpec.hs
+How they use QuickSpec in tip-spec (Create a temp file and then interpret it)
+
+Build issues with hint
+https://github.com/haskell-hint/hint/issues/79

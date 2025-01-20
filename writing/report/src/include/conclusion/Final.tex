@@ -1,0 +1,17 @@
+\section{Final remarks}\label{sec:final-remarks}
+Pisa is able to generate conjectures for Lean and translate a subset of Lean code into Haskell.
+The subset includes data types that are either enumerable, recursive or polymorphic.
+With a translation, Pisa is able to generate conjectures using QuickSpec and RoughSpec, which then can be ported back into Lean for the user to prove.
+Through precision and recall analysis, it was shown that Pisa has high precision ($80\%-90\%$), but a wider range of recall ($45\%-80\%$).
+
+Pisa was integrated into a macro with an associated code action.
+This allows users to utilize Pisa within their editor while adding or changing definitions.
+
+There are some limitations, mostly regarding more complex types.
+For example, instantiating polymorphic types (such as lists of natural numbers) is not supported.
+Further, dependent types and type classes are not constructable, which limits the potential of Pisa.
+
+An extension to Pisa would be that of dependent types and type classes.
+To attempt this, our recommendation would be to reimplement the full functionality in Lean.
+We believe this has the best potential to be successful.
+Implementing Pisa fully in Lean would also allow for the usage of instantiation of Polymorphic data types.

@@ -1,0 +1,411 @@
+% ~2 min
+% And that's that for the lean part so far.
+% The exported data is now piped to the haskell executable and deserialized.
+% This is where the main focus of our work happens.
+% - Transpiling the Lean code to Haskell
+% ~~~~~~~~
+% There are two aspects to the transpilation that are handled a bit differently.
+% Data types and their constructors for one
+% And second, other definitions, mainly functions.
+% ~~~~~~~~
+% For data types there is a pretty straight forward corespondence between the languages
+% as is demonstrated by this list-like data type.
+% This is however somewhat fragile.
+% In Haskell types and values live in two separate worlds,
+% whereas in Lean types can depend regular values and are themselves regular values
+% But for the scope of our tool, this difference is not accounted for.
+% ~~~~~~~~
+% The actual exported representation is more akin to this snipet.
+% The important difference here is that the variable alpha is not shared between the definitions
+% ~~~~~~~~
+% So here's the same definition showcasing their independence
+% But in the generated Haskell code this is not permitted
+% So first we must homonogize these definitons by renaming and removing the type variable
+% ~~~~~~~~
+% When that is done, we simply have to be able to translate these type signatures
+% Which happened to be pretty straight forward.
+% ~~~~~~~~
+% Finally, to help the conjecture generator abstractly represent arbitrary polymophism
+% we have replace the type variable with a specific type called `Poly`
+% What proved to not be as straight forward as this is translating regular definitions.
+
+\begin{frame}{Lean to Haskell Transpiler} % Kiren
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[font=\footnotesize, ->, >={Stealth[sep]}, scale=0.7, every node/.style={scale=0.7}]
+    \tikzstyle{module} = [rectangle, draw, rounded corners=6, inner sep=7, minimum height=23]
+    \tikzstyle{desc} = [pos=0.45, fill=white, font=\scriptsize, align=center, inner sep=1]
+    \tikzstyle{fesc} = [text opacity= 0.3, fill opacity=1, desc]
+
+    \fade
+    \node[draw]                          (us)  {User};
+    \node[module, below      =0.4 of us] (lm)  {Lean Macro};
+    \node[module, below      =of lm]     (ex)  {Lean Exporter};
+    \unfade
+    \node[module, below right=of ex]     (l2h) {Lean to Haskell transpiler};
+    \node[module, above right=of l2h]    (cg)  {Haskell Conjecture generator};
+    \node[module, above      =of cg]     (h2l) {Haskell to Lean transpiler};
+
+    \fade
+    \draw (us)  -- (lm);
+    \draw (lm)  -- (cg)  node[fesc]        {Aliases to use for definitions and \\ size parameter for term generation};
+    \draw (lm)  -- (ex)  node[fesc]        {Set of definitions};
+    \draw (ex)  -- (l2h) node[fesc]        {JSON representation};
+    \unfade
+    \draw (l2h) -- (cg)  node[desc]        {Definitions translated to Haskell};
+    \draw (cg)  -- (h2l) node[desc]        {List of conjectures in an internal format};
+    \draw (h2l) -- (lm)  node[desc, above] {Lean code of conjectures};
+  \end{tikzpicture}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Lean to Haskell Transpiler} % Kiren
+  Two aspects
+
+  \begin{itemize}
+  \item Data types \& Constructors
+  \item Definitions: Functions
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Lean to Haskell Transpiler: Data types \& Constructors} % Kiren
+  % \begin{LeanCode}
+  %   inductive B where | t :  B | f :  B
+  % \end{LeanCode}
+  % \begin{HaskellCode}
+  %   data      B where ; T :: B ; F :: B
+  % \end{HaskellCode}
+
+  \begin{overprint}
+    \onslide<1-2>
+    \begin{columns}[T]
+      \begin{column}{.48\textwidth}
+        \begin{LeanCode}
+          inductive L α
+            where
+            | Nil : L α
+            | Cons : α → L α → L α
+        \end{LeanCode}
+        \centering
+        Lean version
+      \end{column}
+      \begin{column}{.48\textwidth}
+        \begin{HaskellCode}[fontsize=\small]
+          data L α
+            where
+            Nil :: L α
+            Cons :: α -> L α -> L α
+        \end{HaskellCode}
+        \centering
+        Haskell version
+      \end{column}
+    \end{columns}
+    \onslide<3-4>
+    \begin{columns}[T]
+      \begin{column}{.48\textwidth}
+        \begin{LeanCode}
+          inductive L : Type → Type
+            where
+            | Nil : L β
+            | Cons : γ → L γ → L γ
+        \end{LeanCode}
+        \centering
+        Lean version
+      \end{column}
+      \begin{column}{.48\textwidth}
+        \begin{HaskellCode}[fontsize=\small]
+          data L α
+            where
+            Nil :: L α
+            Cons :: α -> L α -> L α
+        \end{HaskellCode}
+        \centering
+        Haskell version
+      \end{column}
+    \end{columns}
+    \onslide<5>
+    \begin{columns}[T]
+      \begin{column}{.48\textwidth}
+        \begin{LeanCode}
+          inductive L : Type → Type
+            where
+            | Nil : L β
+            | Cons : γ → L γ → L γ
+        \end{LeanCode}
+        \centering
+        Lean version
+      \end{column}
+      \begin{column}{.48\textwidth}
+        \begin{HaskellCode}[fontsize=\small]
+          data L Poly where
+            Nil :: L Poly
+            Cons :: Poly -> L Poly
+                         -> L Poly
+        \end{HaskellCode}
+        \centering
+        Haskell version
+      \end{column}
+    \end{columns}
+  \end{overprint}
+
+  \vspace{1cm}
+  \begin{columns}[T]
+    \begin{column}{.65\textwidth}
+  \begin{overprint}
+    \onslide<2>
+    \begin{LeanCode}
+      L := Type → Type
+      L.Nil := (α : Type) → L α
+      L.Cons := (α : Type) → α → L α → L α
+    \end{LeanCode}
+    \onslide<3>
+    \begin{LeanCode}
+      L := Type → Type
+      L.Nil := (β : Type) → L β
+      L.Cons := (γ : Type) → γ → L γ → L γ
+    \end{LeanCode}
+    \onslide<4->
+    \begin{LeanCode}
+      L := (α : Type) → Type
+      L.Nil := L α
+      L.Cons := α → L α → L α
+    \end{LeanCode}
+  \end{overprint}
+      \end{column}
+    \end{columns}
+  \bigskip
+  \begin{overprint}
+    \onslide<2-3>
+    \begin{center}
+      Exported representation
+    \end{center}
+  \end{overprint}
+\end{frame}
+
+\begin{frame}[allowframebreaks,fragile]{Lean to Haskell Transpiler: Functions} % Pingu
+  Intermediate representation used by Lean
+
+  % So, a question that arises when using lean is how it evaluates expressions in the editor.
+  % Short answer, using an IR that gets converted to C code, and is then evaluated.
+  % What if, you can export the first iteration of this IR?
+  % Turns out, you can
+
+  \framebreak
+  \begin{columns}[T]
+    \begin{column}{.48\textwidth}
+      \begin{LeanCode}
+        inductive B where
+          | t : B
+          | f : B
+
+        def not (b : B) : B :=
+          match b with
+          | .t => .f
+          | .f => .t
+      \end{LeanCode}
+      \centering
+      Lean version
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \begin{LeanIR}
+        def not (x_1 : u8) : u8 :=
+          case x_1 : u8 of
+          B.t →
+            let x_2 : u8 := 1;
+            ret x_2
+          B.f →
+            let x_3 : u8 := 0;
+            ret x_3
+      \end{LeanIR}
+      \centering
+      IR version
+    \end{column}
+  \end{columns}
+
+  % Here, we can see an example of the conversion between the Lean code and IR for the function not
+  % It is quite similar, but worth noting is that the Boolean has been converted into an number, representing the index it held in the enum.
+  % The IR tries to do these optimizations, even in the first iteration, since they allow for leaner (haha) code.
+
+  \framebreak
+  \begin{LeanCode}
+  inductive L (α : Type) where
+    | Nil : L α
+    | Cons : α → L α → L α
+
+  def append {α : Type} (xs : L α) (ys : L α) : (L α) :=
+    match xs with
+    | .Nil => ys
+    | .Cons a as => .Cons a (append as ys)
+  \end{LeanCode}
+
+  % So what if, we have a more complicated example, such as append for lists.
+  % There is polymorphism, and recursion in this, how does the IR handle it?
+
+  \framebreak
+
+  \begin{minted}[frame=single,autogobble,fontsize=\tiny]{Lean4}
+  def append._rarg (x_1 : obj) (x_2 : @& obj) : obj :=
+    case x_1 : obj of
+    L.Nil →
+      inc x_2;
+      ret x_2
+    L.Cons →
+      let x_3 : u8 := isShared x_1;
+      case x_3 : u8 of
+      Bool.false →
+        let x_4 : obj := proj[1] x_1;
+        let x_5 : obj := append._rarg x_4 x_2;
+        set x_1[1] := x_5;
+        ret x_1
+      Bool.true →
+        let x_6 : obj := proj[0] x_1;
+        let x_7 : obj := proj[1] x_1;
+        inc x_7;
+        inc x_6;
+        dec x_1;
+        let x_8 : obj := append._rarg x_7 x_2;
+        let x_9 : obj := ctor_1[L.Cons] x_6 x_8;
+        ret x_9
+  def append (x_1 : ◾) : obj :=
+    let x_2 : obj := pap append._rarg._boxed;
+    ret x_2
+  def append._rarg._boxed (x_1 : obj) (x_2 : obj) : obj :=
+    let x_3 : obj := append._rarg x_1 x_2;
+    dec x_2;
+    ret x_3
+  \end{minted}
+
+  % The append function is ''just`` 2 lines.
+  % But what is this black box?
+  % And how does the _rarg work?
+  % Well, the box is to allow for partially applied functions in a special way, and is named irrelevant.
+  % It is done to allow for the boxing aspect, since the IR is based on Lambda RC which allows for mutable data.
+  % And the actually applied values will be of the object type
+
+  \framebreak
+
+  What about values then?
+
+  % Values are how IR handles, and for most of the types used, will usually either become objects, or enums.
+
+  \framebreak
+
+  \begin{HaskellCode}
+    data Object = Object { rc :: Int, tag :: Natural }
+
+    data Val
+      = Unsigned Natural
+      | ** ...**
+      | VCtor { o :: Object, vs :: [Val] }
+
+    fromValPoly :: Val -> Poly
+    fromValPoly = \case
+      Unsigned a -> Poly a
+
+    toValPoly :: Poly -> Val
+    toValPoly (Poly a) = Unsigned a
+  \end{HaskellCode}
+
+  % Here we can see the encoding of the different values, but since we need to be able to autogenerate the datatypes explained by Erik earlier, the Poly type was introduced to handle the case for conversion to naturals here.
+
+  \framebreak
+
+  \begin{HaskellCode}
+    data L where
+      Nil  :: L
+      Cons :: Poly -> L -> L
+
+    toValL :: L -> Val
+    toValL = \a -> case a of
+      Nil -> VCtor (Object 1 0) []
+      Cons b c ->
+        VCtor (Object 1 1) [toValPoly b, toValL c]
+
+    fromValL :: Val -> L
+    fromValL = \(a :: Val) -> case a of
+      VCtor (Object _ 0) [] -> Nil
+      VCtor (Object _ 1) [b, c] ->
+        Cons (fromValPoly b) (fromValL c)
+  \end{HaskellCode}
+
+  % So each datatype that we introduce will have to create two functions.
+  % One from Val and one to Val.
+  % In the case of Lists, we utilize the Poly type to make it monomorphic.
+
+\end{frame}
+
+\begin{frame}[allowframebreaks,fragile]{Conjecture generation} % Pingu
+  Get signatures of the roots
+
+  Apply QuickSpec \& RoughSpec
+
+  % So, we have the roots, as given by the user, and we have generated code to evaluate them.
+  % Time to plop them into a list for QuickSpec and RoughSpec to generate conjectures on.
+  % The signatures will be the name, and how to call them.
+  % QuickSpec and RoughSpec will then create different combinations of the specified signatures, and test if they hold up.
+  % If a case fails, that is tossed, otherwise they are kept as potential laws and presented to user.
+
+  \pagebreak
+
+  \begin{HaskellCode}
+  environment :: Map Name Decl
+  environment = fromList [**...**]
+
+  append = FDecl {**...**}
+
+  sigs :: [Sig]
+  sigs =
+    [ monoType ((Proxy :: Proxy L))
+    , con "append"
+        (\ a b -> fromValL
+          (eval append environment
+            [toValL a, toValL b]
+          )
+        )
+    ]
+  \end{HaskellCode}
+
+  \pagebreak
+
+  \begin{minted}[frame=single, autogobble]{Output}
+  == Laws ==
+    1. append (append x y) z = append x (append y z)
+  \end{minted}
+
+  % Here we can see an example of what would be expected if only the append function is supplied.
+  % And this is the associativity law, which would be expected.
+
+\end{frame}
+
+\begin{frame}[allowframebreaks,fragile]{Reverse translation} % Pingu
+  The names of functions can be preserved
+
+  The types need to be kept in a map
+
+  \pagebreak
+
+  \begin{minted}[frame=single, autogobble, fontsize=\footnotesize]{Lean}
+  (x y z : T0'L) : append (append x y) z = append x (append y z)
+  \end{minted}
+  \fade
+  \begin{minted}[frame=single, autogobble, fontsize=\footnotesize]{Lean}
+  (x y z : L α)  : append (append x y) z = append x (append y z)
+  \end{minted}
+
+  \pagebreak
+
+  \fade
+  \begin{minted}[frame=single, autogobble, fontsize=\footnotesize]{Lean}
+  (x y z : T0'L) : append (append x y) z = append x (append y z)
+  \end{minted}
+  \unfade
+  \begin{minted}[frame=single, autogobble, fontsize=\footnotesize]{Lean}
+  (x y z : L α)  : append (append x y) z = append x (append y z)
+  \end{minted}
+
+  % Worth of note is that the names of the functions will not always match up with the ones that can be seen for the user in the editor.
+  % But when constructing the signatures, replacement names can be provided, which override the internal names.
+  % That is great for us, but the names of types are not.
+  % So a mapping between the internal Haskell name and the Lean name is kept for reversing it when sent back to the Lean part.
+\end{frame}

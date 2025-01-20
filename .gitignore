@@ -1,0 +1,11 @@
+.DS_Store
+.idea
+*.log
+tmp/
+ltex.*.txt
+
+.direnv/
+.devenv/
+result
+result-*
+.projectile-cache.eld

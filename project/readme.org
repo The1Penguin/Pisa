@@ -1,0 +1,7 @@
+#+title: Readme
+
+#+begin_quote
+The most common use case for package databases is for the interpreted code to have access to the same packages as the compiled code (but not compiled code itself). The easiest way to accomplish this is via a GHC environment file, and the easiest way to generate a GHC environment file is via cabal. Compile your code using cabal build --write-ghc-environment-files=always; this will create a file named .ghc.environment.<something> in the current directory. At runtime, hint will look for that file in the current directory.
+#+end_quote
+
+https://hackage.haskell.org/package/hint at the end. Otherwise the exportation of instantiations will not work

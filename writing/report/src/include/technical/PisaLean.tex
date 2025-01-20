@@ -1,0 +1,101 @@
+\section{Lean interface}\label{sec:lean-interface}
+Two modules of Pisa interface with Lean: a macro to interact with the complete system and an exporter to extract relevant definitions.
+The distinction of the modules is partly conceptual as there is a natural coupling between their implementations.
+Although the exporter does work as a standalone tool, it is tailored to the macro and other parts of Pisa.
+The macro depends on all parts of the system.
+
+\subsection{Exporter}\label{sec:lean-interface:exporter}
+Parsing arbitrary Lean syntax is non-trivial due to potential user defined parser extensions as explained in \cref{sec:lean:extensible-syntax}.
+The most plausible and sound approach is therefore to utilize reflection within Lean.
+An existing solution, ``ast\_export'' \autocite{ast-export}, generates a JSON representation of the abstract syntax tree for a set of definitions.
+However, determining the semantics of this syntax involves a similar problem due to extensibility.
+Another solution is ``lean4export'' \autocite{Lean4Export} that exports fully elaborated terms (see \cref{sec:lean:typed-lambda-calculus}) compatible with the Lean 3 low-level format.
+Although \textit{lean4export} is sufficient, some missing Lean 4 concepts and relatively slow performance make it inconvenient for the use in Pisa.
+A custom export tool was therefore created.
+
+Given a list of identifiers, the custom export tool first resolves the minimum complete set of required definitions, that being the provided identifiers and their transitive dependencies.
+These definitions are then serialized as JSON documents, and together with a header of metadata, sent to the caller.
+The metadata informs of the root nodes and what identifiers are referred to them.
+
+Transitive dependencies are fetched by traversing the declarations and the structure they hold.
+For example, if a user would be interested in conjectures regarding §or3§ from \cref{lst:lean:transitive-dependencies}, the translation would need the definitions of §B§ and §or§.
+Through traversal of the internal representation, the dependencies are added as objects to also be exported, and then their definitions are also traversed, in the case of more nested definition.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+inductive B where
+  | t : B
+  | f : B
+
+def or : B → B → B
+  | .t, _ => .t
+  | .f, b => b
+
+def or3 (a b c : B) : B := or (or a b) c
+\end{LeanCode}
+\caption
+  [Lean code demonstrating transitive dependencies.]
+  {Lean code demonstrating transitive dependencies by defining a Boolean type as well as the disjunction operator for two and three values, §or§ and §or3§ respectively.}
+\label{lst:lean:transitive-dependencies}
+\end{listing}
+
+The exporter is available both as a self-contained executable, as functions within Lean.
+When used as an executable it can be called in the following manner:
+
+\begin{minted}{bash}
+§pisa-lean Examples.Bool : Examples.Bool.B=B Examples.Bool.not=not§
+\end{minted}
+
+In this case \bash{pisa-lean} is called with the namespace \bash{Examples.Bool} and a list of functions within this namespace after the colon.\footnote{The §=§ used in the example is to rename the functions to a more readable output.}
+The output of \bash{pisa-lean} will begin with a JSON list of the definition names used in the call to \bash{pisa-lean}, called roots.
+The reason that the names in the output are doubled in a pair formation is to allow for reverse translation explained in \cref{sec:pisa-haskell:reverse-translation}.
+The output is followed by representations of inductives, constructors, and definitionals used in the roots.
+This can be seen in the example \cref{lst:json:output}.
+The inductives, constructors, and definitionals are all encoded as separate JSON values.
+
+\begin{listing}[H]
+\begin{json}
+[["Examples.Bool.B","B"], ["Examples.Bool.not","not"]]
+{
+  "conInfo": {
+    "ctorInfo": {
+      "val": {
+        "type": {
+          "const": {
+            "us": [],
+            "declName": "Examples.Bool.B"
+          }
+        },
+        "numParams": 0,
+        "numFields": 0,
+        "name": "Examples.Bool.B.f",
+        "levelParams": [],
+        "isUnsafe": false,
+        "induct": "Examples.Bool.B",
+        "cidx": 1
+      }
+    }
+  }
+}
+|\truncated|
+\end{json}
+\caption{Example output from the exporting tool §pisa-lean§.}
+\label{lst:json:output}
+\end{listing}
+
+\vspace{-0.7cm}
+
+\subsection{Macro}\label{sec:lean-interface:macro}
+
+A macro was created utilizing the same concept as \cref{sec:lean-interface:exporter}, but for use within the language itself and to generate conjectures based on the output.
+It is called within a code editor with LSP-support.
+The calling is done via the macro \lean{#pisa} followed by an optional number that is the size of terms for QuickSpec and RoughSpec, then the names of definitions.
+An example is \lean{#pisa B not}.
+This will generate the same output as \cref{lst:json:output}.
+However, the output will be piped to Pisa directly, which will generate the conjectures as explained in \cref{sec:pisa-haskell}.
+This output is then captured by the macro, which converts it into multiple §theorem§ and applies the §sorry§ keyword as a proof of each §theorem§.
+This then replaces the call site of the macro.
+
+The §sorry§ is a default implementation of something that is yet to be defined.
+§sorry§ is of every type, and will give a warning during compilation.
+This allows the user to not have to do all the proofs at once, but can do the ones that feel relevant at the time.

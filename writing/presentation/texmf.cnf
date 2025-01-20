@@ -1,0 +1,12 @@
+% Additions to prepend to texmf.cnf
+
+
+% It's probably inadvisable to change these. At any rate, we must have:
+% 45 < error_line      < 255;
+% 30 < half_error_line < error_line - 15;
+% 60 <= max_print_line;
+% These apply to TeX, Metafont, and MetaPost.
+% "max_print_line" applies to BibTeX family.
+error_line = 254
+half_error_line = 239
+max_print_line = 10000 % Let the terminal perform line breaks

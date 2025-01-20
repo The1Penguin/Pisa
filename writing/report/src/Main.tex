@@ -1,0 +1,90 @@
+% CREATED BY DAVID FRISK, 2016
+% MODIFIED BY JAKOB JARMAR, 2016
+% A few changes by Birgit Grohe, 2017 and 2018
+% Adjustments with the help of Gustav Örtenberg 2019
+% Parskip % bibliography system updated by Erik Ljungdahl, May 2022
+
+% IMPORT SETTINGS
+\documentclass[12pt,a4paper,twoside,openright]{report}
+%\documentclass[12pt,a4paper]{report}
+\usepackage{import} % Relative imports
+\import{include/settings/}{Settings}
+
+\newcommand{\oneLineTitle}{Pisa}
+\newcommand{\multiLineTitle}[1]{Pisa}
+% The term [#1] indicates that there will be 1 rowbreak to split the title into two pieces, first part before \\[#1] and second part after. If you have a very long title and need to split it up into 3 rows, just use \\[#1] multiple times.
+
+\newcommand{\oneLineSubtitle}{Facilitating conjecture generation in Lean}
+\title{Pisa -- \oneLineSubtitle}
+\author{Nor Führ, Erik Nygren}
+
+\newcommand\TODO[1]{{\huge \textbf{\textcolor{red}{#1}}}}
+
+
+\begin{document}
+
+% COVER PAGE, TITLE PAGE AND IMPRINT PAGE
+\pagenumbering{roman}			% Roman numbering (starting with i (one)) until first main chapter
+\import{include/frontmatter/}{Titlepage}
+
+% ABSTRACT
+\import{include/frontmatter/}{Abstract}
+
+% ACKNOWLEDGEMENTS
+\import{include/frontmatter/}{Acknowledgements}
+
+
+% TABLE OF CONTENTS
+% \setlength{\cftsecnumwidth}{7em}
+\cftsetpnumwidth{2em}
+\pdfbookmark{Table of Contents}{toc}
+\tableofcontents
+
+% List of listings (add to table of contents)
+\cleardoublepage
+\phantomsection
+\pdfbookmark{List of Listings}{listings}
+\listoflistings
+
+% List of conjecture sets (add to table of contents)
+\cleardoublepage
+\phantomsection
+\pdfbookmark{List of Conjecture sets}{conjecturesets}
+\listofconjecturesets
+
+
+% START OF MAIN DOCUMENT
+\cleardoublepage
+\setcounter{page}{1}
+\pagenumbering{arabic} % Arabic numbering starting from 1 (one )
+
+% INTRODUCTION
+\import{include/}{Introduction}
+
+% THEORY
+\import{include/background/}{Introduction}
+
+% METHODS
+\import{include/technical/}{Introduction}
+
+% RESULTS
+\import{include/results/}{Introduction}
+
+% CONCLUSION
+\import{include/conclusion/}{Introduction}
+
+% REFERENCES / BIBLIOGRAPHY
+\cleardoublepage
+\phantomsection % So hyperref does not link to the section above
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+
+% APPENDICES
+\cleardoublepage
+\appendix
+\setcounter{page}{1}
+\pagenumbering{Roman} % Capitalized roman numbering starting from I (one)
+
+\import{include/backmatter/extra_results}{Introduction}
+
+\end{document}

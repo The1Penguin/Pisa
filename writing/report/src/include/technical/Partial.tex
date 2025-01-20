@@ -1,0 +1,12 @@
+\section{Partial and unsafe definitions}\label{sec:partial-and-unsafe-definitons}
+One difference between Lean and Haskell is how a function is defined.
+If a function doesn't properly define all the cases for a match in Lean it will not type check and therefore, not be able to be translated.
+In Haskell, this is a warning and will give an error at runtime.
+This means that by translating functions from Lean to Haskell, functions which do not match all the cases cannot occur.
+However, functions using the \lean{sorry} keyword are still translated.
+The output of these functions utilize a lot of built-in definitions (handled by the runtime) that are not added by the exporter.
+These built-in definitions are not implemented by the interpreter.
+This means that these functions will potentially fail at runtime, which is to be expected.
+QuickSpec and RoughSpec will, because of this, fail to utilize this function if the execution is terminated with an error.
+In addition to what was mentioned above, data types and constructors can be marked as unsafe.
+They are handled by terminating the process, and mentioning that they contain unsafe values.

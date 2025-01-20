@@ -1,0 +1,17 @@
+name = "Pisa"
+version = "0.1.0"
+defaultTargets = ["pisa-lean"]
+
+[[lean_lib]]
+name = "Examples"
+
+[[lean_lib]]
+name = "qsExamples"
+
+[[lean_lib]]
+name = "Pisa"
+
+[[lean_exe]]
+name = "pisa-lean"
+root = "Pisa.Exe"
+supportInterpreter = true

@@ -1,0 +1,46 @@
+\begin{frame}[fragile]{Macro} % Kiren
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[font=\footnotesize, ->, >={Stealth[sep]}, scale=0.7, every node/.style={scale=0.7}]
+      \tikzstyle{module} = [rectangle, draw, rounded corners=6, inner sep=7, minimum height=23]
+      \tikzstyle{desc} = [pos=0.45, fill=white, font=\scriptsize, align=center, inner sep=1]
+      \tikzstyle{fesc} = [text opacity= 0.3, fill opacity=1, desc]
+
+      \fade
+      \node[draw]                          (us)  {User};
+      \unfade
+      \node[module, below      =0.4 of us] (lm)  {Lean Macro};
+      \fade
+      \node[module, below      =of lm]     (ex)  {Lean Exporter};
+      \node[module, below right=of ex]     (l2h) {Lean to Haskell transpiler};
+      \node[module, above right=of l2h]    (cg)  {Haskell Conjecture generator};
+      \node[module, above      =of cg]     (h2l) {Haskell to Lean transpiler};
+      \unfade
+
+      \fade
+      \draw (us)  -- (lm);
+      \draw (lm)  -- (cg)  node[fesc]        {Aliases to use for definitions and \\ size parameter for term generation};
+      \draw (lm)  -- (ex)  node[fesc]        {Set of definitions};
+      \draw (ex)  -- (l2h) node[fesc]        {JSON representation};
+      \draw (l2h) -- (cg)  node[fesc]        {Definitions translated to Haskell};
+      \draw (cg)  -- (h2l) node[fesc]        {List of conjectures in an internal format};
+      \unfade
+      \draw (h2l) -- (lm)  node[desc, above] {Lean code of conjectures};
+    \end{tikzpicture}
+  \end{figure}
+  \smallskip
+  \begin{LeanCode}
+    let conjecturesText ← IO.spawn "pisa" =<< export is
+  \end{LeanCode}
+\end{frame}
+
+\setbeamercovered{transparent}
+\begin{frame}{Alternatives approaches} % Kiren
+  \begin{itemize}[<+>]
+    \item Instantiations of polymorphism
+    \item Proof generation
+    \item Proper translation using reductions
+    \item Performance
+    \item Plausible
+  \end{itemize}
+\end{frame}

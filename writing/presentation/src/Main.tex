@@ -1,0 +1,115 @@
+\documentclass[presentation]{beamer}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{esint}
+\usepackage{unicode-math}
+\usepackage{DejaVuSansMono} % Contains most characters
+\usepackage{sourcecodepro} % Bit better looking monospaced with greek letters
+\usepackage{tikz}                 % Vector graphics
+\usetikzlibrary{arrows.meta,shapes,positioning,tikzmark,decorations.pathmorphing}
+
+\def\aliaser#1#2{%
+  % Lowercase trick, store the symbol without tokenizing it just yet
+  \begingroup%
+  \lccode`~=`#1%
+  \lowercase{\endgroup%
+    \def~{#2}%
+  }%
+  \catcode`#1=13%
+}
+\ExplSyntaxOn % Ignore whitespace, make : _ letters, and ~ a regular space
+
+\usepackage{fontspec}
+% Basically the regular tt font but more complete character set
+\setmonofont[%
+  ItalicFont=NewCMMono10-Italic.otf,%
+  BoldFont=NewCMMono10-Bold.otf,%
+  BoldItalicFont=NewCMMono10-BoldOblique.otf,%
+  SmallCapsFeatures={Numbers=OldStyle}%
+]{NewCMMono10-Regular.otf}
+
+\usepackage{minted}[samepage] % Enables source code listings
+
+\catcode`˹=11
+\catcode`˺=11
+\newminted[LeanCode]{lean4}{frame=single,autogobble,escapeinside=˹˺,fontsize=\small}
+\newminted[JsonCode]{json}{frame=single,autogobble,escapeinside=**,fontsize=\small}
+\newmintinline[lean]{text}{}
+\newminted[HaskellCode]{Haskell}{frame=single,autogobble,escapeinside=**,fontsize=\footnotesize}
+\newmintinline[haskell]{text}{}
+\newminted[LeanIR]{Lean4}{frame=single,autogobble,fontsize=\small}
+
+\newcommand\unfade{\pgfsetfillopacity{1}\pgfsetstrokeopacity{1}}
+\newcommand\fade{\pgfsetfillopacity{0.3}\pgfsetstrokeopacity{0.3}}
+\NewDocumentEnvironment{LeanCodeHL}{}{
+  \VerbatimEnvironment
+  \begingroup
+  \aliaser‹\unfade
+  \aliaser›\fade
+  \fade
+  % TODO: escapeinside and gobble don't work together for some unknown reason
+  \begin{minted}[escapeinside=˹˺,autogobble]{lean4}
+}{
+  \end{minted}
+  \unfade
+  \endgroup
+}
+
+\usepackage{newunicodechar}
+\makeatletter
+\newdimen{\fs}
+\def\loanChar#1{
+  \newunicodechar{#1}{{
+    \fontspec{DejaVuSansMono.ttf}
+    % Dejavu is slightly wider than sourcecodepro
+    \setlength{\fs}{\f@size pt}\fs=0.996\fs
+    \fontsize{\strip@pt\fs}{\strip@pt\dimexpr1.2\fs\relax}\selectfont
+    #1
+  }}
+}
+\makeatother
+
+\loanChar{◾}
+\loanChar{⟨}
+\loanChar{⟩}
+
+% Shorthand for texttt
+\newunicodechar{§}{\makeabbreviationtt}
+\def\makeabbreviationtt#1§{\texttt{#1}}
+
+\NewDocumentCommand\itemal{O{3cm}mm}{\item ​\hbox to #1{#2\hfill}{#3}}
+
+\ExplSyntaxOff
+\usetheme{default}
+\author{Nor Führ \& Erik Nygren}
+\titlegraphic{\includegraphics[scale=0.1]{figures/logo.pdf}}
+\title{\Huge{Pisa} \\ \Large{Mathematical discovery in Lean}}
+
+
+\setbeamertemplate{navigation symbols}{}
+\hypersetup{
+ pdfauthor={},
+ pdftitle={Mathematical discovery in Lean},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={},
+ pdflang={English}}
+\usemintedstyle{tango}  % a nice, colorful theme
+
+\begin{document}
+\frame{\titlepage}
+
+\input{sections/Intro.tex} % Pingu
+\input{sections/Overview.tex} % Kiren
+\input{sections/Lean.tex} % Kiren
+\input{sections/Haskell.tex} % Pingu
+\input{sections/End.tex} % Kiren
+
+\end{document}

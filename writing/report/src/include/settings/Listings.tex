@@ -1,0 +1,35 @@
+% Contains more characters but are sans serif
+% \usepackage{DejaVuSansMono} \setmonofont{DejaVu Sans Mono}
+% \usepackage{sourcecodepro}
+
+% \usepackage{tgcursor} \setmonofont{TeX Gyre Cursor}
+% \setmonofont[StylisticSet=1]{inconsolata}
+% \usepackage[scaled=0.8]{FiraMono}
+
+\usepackage{fontspec}
+% Basically the regular tt font but more complete character set
+\setmonofont[%
+  ItalicFont=NewCMMono10-Italic.otf,%
+  BoldFont=NewCMMono10-Bold.otf,%
+  BoldItalicFont=NewCMMono10-BoldOblique.otf,%
+  SmallCapsFeatures={Numbers=OldStyle}%
+]{NewCMMono10-Regular.otf}
+
+\usepackage{minted}[samepage] % Enables source code listings
+
+\newminted[LeanCode]{lean4}{frame=single,autogobble,fontsize=\small}
+\newmintinline[lean]{text}{}
+\newminted[HaskellCode]{Haskell}{frame=single,autogobble,fontsize=\small,escapeinside=**}
+\newmintinline[haskell]{text}{}
+\newmintinline[bash]{text}{}
+\newmintinline[fancy]{fancy}{}
+\newminted[json]{json}{frame=single,autogobble,fontsize=\small,escapeinside=||}
+
+
+\usepackage{newunicodechar}
+
+% Shorthand for texttt
+\newunicodechar{§}{\makeabbreviationtt}
+\def\makeabbreviationtt#1§{\texttt{#1}}
+
+\newcommand\truncated{{\rmfamily\itshape…truncated…}}

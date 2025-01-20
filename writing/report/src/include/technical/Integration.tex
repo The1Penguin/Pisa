@@ -1,0 +1,8 @@
+\section{Integration of subsystem}\label{sec:integration-of-subsystem}
+Pisa has been incorporated into a macro for use within Lean.
+A user utilizes \lean{#pisa} within a namespace.
+They give an optional natural number which regulates the term size, and the identifiers they are interested in.
+This provides the user with a Language Server Protocol (LSP) code action.
+The code action will begin by fetching the definitions as explained in \cref{sec:lean-interface}.
+With these definitions, Pisa is called with a given size, and then the definitions are streamed to Pisa's process.
+After some time, the output of Pisa is parsed and then added to the file where the macro was called.

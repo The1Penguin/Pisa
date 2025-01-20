@@ -1,0 +1,242 @@
+\section{Lean}\label{sec:lean}
+Lean is a dependently typed functional programming language that is combined with text editor plugins to make a proper interactive theorem prover (ITP).
+In this thesis Lean refers specifically to the latest version, Lean 4.
+It is significantly more extensible than earlier iterations and features a compiler that is able to generate relatively efficient C code \autocite{Lean4}.
+The efficient compiler has enabled it to be mostly bootstrapped, however, the kernel used for verification is yet to be ported from \cpp.
+
+Three of the concepts utilized by Lean are of particular relevance to this thesis.
+First, a typed lambda calculus that relates to the source code, encodes definitions, and the types of definition \autocite{Declaration}.
+The lambda calculus allows for type checking and reductions.
+Second, a kernel that is a small, trusted computing base.
+The kernel is used for verification of correctness for Lean programs.
+The reason why it is small is so that it should itself be verifiable, in order to trust its output.
+Third, an intermediate representation (IR) which is used for compilation of programs, that allows for evaluation of statements or running entire programs \autocite{IR}.
+
+\subsection{Example of syntax}
+Familiarity with Lean syntax may help to better understand parts of this thesis.
+The examples that follows should give a sense of the syntax used in some Lean listings.
+However, syntax in Lean is very extensible as will be explained later, and the same code may be written in multiple ways.
+
+\paragraph*{Algebraic data types} can be defined as in \cref{lst:syntax:inductives}.
+The start of such a declaration use the keyword \lean{inductive}, which signifies a type that induction can be done on.
+Booleans are, for example, defined as the sum of two trivial values, §t§ and §f§ representing true and false respectively.
+Each variant of the sum is syntactically initiated by a vertical bar followed by its name and type.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+inductive B where | t : B | f : B
+
+inductive P where | p : B → B → P
+
+inductive N where | z : N | s : N → N
+
+inductive L : Type → Type where
+  | Nil : L α
+  | Cons : α → L α → L α
+\end{LeanCode}
+\caption{Example of inductive types declared in Lean.}
+\label{lst:syntax:inductives}
+\end{listing}
+
+All inductives in Lean are a sum of product types.
+In the second definition a product type, §P§, is exemplified by adding premises, or arguments, to the variant type.
+In an inductive definition these arguments may be of the type that is constructed, as shown by §N§.
+Here, natural numbers are defined recursively as in the Peano axioms; a zero, §Z§, is trivially constructed, and by providing any number $n$ a successive number $n+1$ is constructed with §S n§.
+
+A type itself may be parametric, that is to say the type itself takes arguments in the form of types.
+The final example in \cref{lst:syntax:inductives} demonstrates a definition of a polymorphic list, which takes a type as an argument.
+In this definition the given type is referred to by a free variable, §α§, that will be resolved by Lean from the context where the constructors are used.
+In \lean{Cons t Nil} the type can be inferred to lists of Booleans since the first argument to §Cons§ is a boolean, which is consistent with §Nil§ since it is a list of any type.
+
+\paragraph*{Definitions} associate any expression with a name.
+Some examples are given in \cref{lst:syntax:def}.
+Since types are ostensibly values of the type §Type§ there is no strict distinction between values and types.
+Thus, what would be defined as a type alias in languages such as Haskell where values and types are distinguished, is a regular definition, such as the example \lean{NatList}.
+However for this thesis, definitions are typically functions, which is shown in the three last §def§ in \cref{lst:syntax:def}.
+
+Case matching on types is done in two different ways: one where it is specified what is matched on, as can be seen in \lean{not} and \lean{add}, and the other where the case can be done instead of a lambda, which is seen in \lean{sum}.
+The dot seen before the constructors in the §match§ is to avoid opening the inductive types scope, that is to say adding the constructor as a function in the current context.
+The way Lean finds the right constructor using the dot syntax is by looking through the context for a constructor with that name and type.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+def NatList := L N
+
+def not (b : B) :=
+  match b with | .t => .f | .f => .t
+
+def add : N → N → N := λ n m =>
+  match m with | .Z => n | .S m' => .S (add n m')
+
+def sum : NatList → N
+  | .Nil => .Z
+  | .Cons a as => add a (sum as)
+\end{LeanCode}
+\caption{Example of how definitions can be declared in Lean.}
+\label{lst:syntax:def}
+\end{listing}
+
+\paragraph*{Theorems} are a special case of regular definitions that are used when proving propositions.
+The truth value of a proposition is proven by having a resulting type that is a §Prop§.
+Reflexivity or equality, is the proposition that is relevant for the conjectures generated by Pisa.
+Reflexivity states that the left and right hand sides are definitionally equivalent and has a special syntax which is \lean{lhs = rhs}~\autocite{rfl}.
+The example in \cref{lst:syntax:thm} is a theorem proving that \lean{not (not b)} is equivalent to \lean{b}.
+This verified by the type checker, ensuring that both potential cases of §b§ resolve to the same definition.
+In the case where \lean{b = .t}, \lean{not (not .t)} resolves to §.t§, and is therefore being able to construct §rfl§ (§rfl§ is one of the constructors of properties).
+Theorems are the basis of using Lean as a proof engine, since the resulting type should be a truthful statement.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+theorem not_not (b : B) : not (not b) = b :=
+  match b with | .t => rfl | .f => rfl
+\end{LeanCode}
+\caption
+  [Example of a theorem proving elimination of double negations.]
+  {Example of a theorem in Lean. In this case proving elimination of double negations by constructing a reflexivity value.}
+\label{lst:syntax:thm}
+\end{listing}
+
+\subsection{Extensible syntax}\label{sec:lean:extensible-syntax}
+A central feature of Lean is that the parser may be extended by the code that itself is parsing \autocite{LeanMacros}.
+This is a more generalized approach to syntactic sugar supported by many other languages, including Lean 3.
+By supporting arbitrary syntax Lean can embed domain specific languages appropriate for the context in which a proof is developed.
+This greatly improves usability as an ITP.
+
+The core idea to this extensibility is to quantify syntax elements and their rules, which is done through syntactic categories, e.g. identifiers, terms, or commands.
+Additional new categories may be devised, and any category can be extended with syntax rules.
+There are two kinds of rules, \textit{macros} and \textit{elaborators}.
+A macro transforms syntax into other syntax, which in turn may be described by another macro.
+When no macros are applicable to a piece of syntax it is finally evaluated by a matching elaborator.
+These produce computations with side effects, that have access to the internal compiler state.
+
+Elaborators enable context aware syntax.
+An example provided by~\cite{Elaborators}, is the syntax \lean{a !: b}, which means that §a§ will only evaluate if it is not of the type §b§.
+In \cref{lst:extensible:not}, §!:§ allows the compiler to verify that the first term is not of a certain type, even if it depends on a larger context.
+
+\begin{listing}[ht]
+\begin{LeanCode}
+#eval ([1, 2, 3] !: String) -- Evaluates to [1,2,3]
+#eval (5 !: Nat) -- Fails type checking due to 5 being of the type Nat
+\end{LeanCode}
+\caption
+  [Example of extensible syntax in Lean.]
+  {Example of extensible syntax, which elaborates a term to a different term that may or may not type check.}
+\label{lst:extensible:not}
+\end{listing}
+
+Elaboration produces expressions for the Lean kernel, that may either be evaluated for soundness or transformed into executable code.
+The former relying on the typed lambda calculus, and the latter on the IR, both described in the following sections.
+
+% \subsection{Language server}\label{sec:lean:lsp}
+
+\subsection{Typed lambda calculus}\label{sec:lean:typed-lambda-calculus}
+Lean has a dependently typed lambda calculus that is used for type checking which enables the use of dependent types \autocite{Lean}.
+It has fundamental declarations, but the main ones that are used for this thesis are §definitional§, §constructor§, §inductive§ and §recursor§ values.
+These all explain different aspects of the language, where §constructor§ is the explanation of how the constructor works, §inductive§ for data types, §definitional§ for definitions (such as functions), and §recursor§ for how recursion is done on inductives \autocite{Declaration}.
+All the before mentioned, have a type, which is an expression.
+
+Expressions are the lambda calculus in action.
+The lambda expressions have the standard application, lambda, and variable constructors one would expect.
+The lambda expressions use de Bruijn Indices, which uses numbers to represent what binder a variable references.\footnote{There also exists free and meta variables that do not use de Bruijn Indices.}
+Worth of note, is the constructor \lean{Const}.
+\lean{Const} is how definitions are mentioned, for example in an application, in the current definition.
+
+The §recursor§ value is used to represent mathematical induction on §inductive§ types.
+A set of functions are auto generated for each inductive type to use this. An example of an auto generated function is \lean{.rec}.
+\lean{.rec} is a unique part of the language, that is based on the structure of its inductive counterpart.
+This enables higher level concepts such as case matching and recursion to be simple to represent.
+Using the natural numbers as an example, as can be seen in \cref{lst:recursor}.
+The first argument of \lean{.rec} is the §motive§, which there may be more than of depending on what criteria is needed for recursion.
+The §motive§ is what the resulting operation should resolve to, for example a boolean.
+In the case of a boolean the motive would look like the following: \lean{motive : N → B}.
+Following this is how the cases should result in different resulting values.
+Last, is the value that recursion is performed on.
+The return type of \lean{.rec} is dependent on the motive, as mentioned, therefore, the §motive§ is applied to the value, to figure out what the resulting type is.
+
+\vspace{-0.4cm}
+\begin{listing}[H]
+\begin{LeanCode}
+inductive N where
+  | Z : N
+  | S : N → N
+
+N.rec {motive : N → Type}
+      (Z : motive Z)
+      (S : (a : N) → motive a → motive (S a))
+      (t : N) :
+      motive t
+\end{LeanCode}
+\caption
+  [Pseudo Lean code demonstrating the auto generated function §.rec§.]
+  {Pseudo Lean code demonstrating how the auto generated function §.rec§ is added to natural numbers.}
+\label{lst:recursor}
+\end{listing}
+
+\subsection{Intermediate representation}\label{sec:lean:intermediate-representation}
+To construct efficient C code Lean definitions are transformed into an intermediate representation (IR).
+This additionally enables efficient interactive evaluation of Lean code.
+Built into Lean is a provided command \lean{#eval}.
+\lean{#eval} is used to evaluate most Lean expressions, similar to an external interpreter but within the document editor.
+For example, \lean{#eval 4 + 4} would, as one would expect, print §8§.
+
+The IR of Lean is based on \λ{Pure} and \λ{Rc}, explained in \citetitle{Beans} by~\cite{Beans}.
+The IR could be seen through the lens of C; it deals with a list of sequential instructions and branches of instructions.
+All values are represented by the following types, described by~\cite{IR}:
+\vspace{-0.2cm}
+\begin{multicols}{4}
+\begin{itemize}[noitemsep]
+    \item float
+    \item uint8
+    \item uint16
+    \item uint32
+    \item uint64
+    \item usize
+    \item irrelevant
+    \item object
+    \item tobject
+    \item float32
+    \item struct
+    \item union
+\end{itemize}
+\end{multicols}
+\vspace{-0.2cm}
+
+For this thesis, values in Lean will usually be encoded as a constructor, based on an §inductive§ tagged with an identifying type.
+In \cref{lst:ir}, \lean{n} would be encoded as a constructor with the tag $1$ due to being the second constructor in the inductive type.
+\lean{n} would then have a pointer to the sub constructor \lean{S(Z)} in its list of values associated to the constructor.
+\begin{listing}[H]
+\begin{LeanCode}
+inductive N where
+  | Z : N
+  | S : N → N
+
+-- zero =           Constructor (Tag 0) []
+-- one  =           Constructor (Tag 1) [zero]
+def n := S(S(Z)) -- Constructor (Tag 1) [one]
+\end{LeanCode}
+\caption[Illustration of the IR representation for inductive Lean values.]{
+  Illustration of the IR representation for some Lean values.
+  Numbers constructed using an inductive Peano definitions with comments showing their respective IR representation.
+}
+\label{lst:ir}
+\end{listing}
+
+\vspace{-0.4cm}
+In contrast to how \cref{lst:ir} would be encoded, values of \lean{B} in \cref{lst:ir2} would be encoded as an unsigned integer.
+Since no constructor in \lean{B} requires any arguments, it is interpreted as an enum, since it only needs a tag.
+\lean{true} would therefore be encoded to a $0$, and \lean{false} as $1$.
+
+\begin{listing}[H]
+\begin{LeanCode}
+inductive B where
+  | t : B
+  | f : B
+
+def true  := .t -- 0 : uint8
+def false := .f -- 1 : uint8
+\end{LeanCode}
+\caption
+  [Illustration of the IR representation for enumerated Lean values.]
+  {Illustration §true§ and §false§ encoding the Boolean value for true and false and comments with their respective IR representation.}
+\label{lst:ir2}
+\end{listing}

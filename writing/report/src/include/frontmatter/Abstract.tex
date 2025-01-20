@@ -1,0 +1,29 @@
+% CREATED BY DAVID FRISK, 2016
+\oneLineTitle\\
+\oneLineSubtitle\\
+Nor Führ\\
+Erik Nygren\\
+Department of Computer Science and Engineering\\
+Chalmers University of Technology and University of Gothenburg
+
+\thispagestyle{plain} % Suppress header
+\pdfbookmark{Abstract}{abstract}
+\section*{Abstract}
+As time has passed, the rigour needed for mathematical proofs has increased.
+Interactive theorem provers were introduced to help with proof verification during proof development.
+This project aims to aid users while they use a particular interactive theorem prover, known as Lean 4, by facilitating the use of conjecture generation for the language.
+Conjecture generation can help users understand the domain that they are working in, or automate what proofs might be needed for a more intricate proof.
+
+To facilitate conjecture generation in Lean, a tool called Pisa was introduced.
+It utilizes tooling from Haskell to generate conjectures.
+To be able to utilize Haskell tooling for conjecture generation, a translation from Lean to Haskell was created, that supports data type translation and has an interpreter for functions.
+The translation works for enumerable, recursive, and polymorphic data types.
+With the translation, generation of conjectures is performed and then translated back into Lean code for the user to prove them.
+This was all tied into a macro, that is callable from the users' editor, meaning that usage of Pisa can be done while adding and modifying definitions.
+
+
+% KEYWORDS (MAXIMUM 10 WORDS)
+\vfill
+Keywords: Transpilation, Conjecture generation, Theory exploration, Interactive theorem prover, Interpreter.
+
+\cleardoublepage

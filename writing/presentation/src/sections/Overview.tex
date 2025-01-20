@@ -1,0 +1,47 @@
+% ~ 1 min
+% So heres an overvew of the data flow of the tool.
+% From the demo you saw the perspective of the user.
+% They interract with the tool through a lean macro.
+% This macro sort of orchestrates everything
+% So first it retrives relevant information through an exporter
+% This information is then passed on to the haskell component that consists of three parts
+% ~~~~~~~~~~
+% Here the definitions are first translated into Haskell for which conjectures can be generated.
+% Those are then translated back into Lean and returned to the macro to be inserted for the user.
+
+% We'll now chronologicaly go into further details
+
+\begin{frame}{How did we do this?} % Kiren
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[font=\footnotesize, ->, >={Stealth[sep]}, scale=0.7, every node/.style={scale=0.7}]
+    \tikzstyle{module} = [rectangle, draw, rounded corners=6, inner sep=7, minimum height=23]
+    \tikzstyle{desc} = [pos=0.45, fill=white, font=\scriptsize, align=center, inner sep=1]
+
+    \node[draw]                          (us)  {User};
+    \node[module, below      =0.4 of us] (lm)  {Lean Macro};
+    \node[module, below      =of lm]     (ex)  {Lean Exporter};
+    \node[module, below right=of ex]     (l2h) {Lean to Haskell transpiler};
+    \node[module, above right=of l2h]    (cg)  {Haskell Conjecture generator};
+    \node[module, above      =of cg]     (h2l) {Haskell to Lean transpiler};
+
+    \draw (us)  -- (lm);
+    \draw (lm)  -- (cg)  node[desc]        {Aliases to use for definitions and \\ size parameter for term generation};
+    \draw (lm)  -- (ex)  node[desc]        {Set of definitions};
+    \draw (ex)  -- (l2h) node[desc]        {JSON representation};
+    \draw (l2h) -- (cg)  node[desc]        {Definitions translated to Haskell};
+    \draw (cg)  -- (h2l) node[desc]        {List of conjectures in an internal format};
+    \draw (h2l) -- (lm)  node[desc, above,fill=none] {Lean code of conjectures};
+
+    \pause
+    \draw[draw=gray, rounded corners, thick, draw=red, -]
+      ([xshift=1em, yshift=1em]h2l.north east) -|
+      ([xshift=1em]cg.south east) --
+      ([yshift=-1em]l2h.south east) -|
+      ([xshift=-1em, yshift=-1em]l2h.south west) -|
+      ([xshift=-1em]l2h.north west) --
+      ([yshift=1em]h2l.north west) --
+      ([xshift=1em, yshift=1em]h2l.north east);
+  \end{tikzpicture}
+\end{figure}
+\end{frame}
