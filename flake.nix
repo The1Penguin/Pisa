@@ -40,7 +40,7 @@
       perSystem = { self', lib, pkgs, ... }:
         let
           infuse = import inputs.infuse { inherit lib; };
-          ghcVer = "ghc910";
+          ghcVer = "ghc912";
           hPkgs = customHaskell.packages.${ghcVer};
           customHaskell = infuse pkgs.haskell {
             packages.${ghcVer}.__input.overrides.__overlay = (hfinal: hprev:
@@ -78,7 +78,14 @@
                 });
 
                 quickspec = callCabal2nix "quickspec" inputs.roughspec { };
+
+                twee-lib = pkgs.haskell.lib.overrideCabal hprev.twee-lib {
+                  version = "2.4.2";
+                  sha256 = "sha256-qXH8LIrBzJPvAZgulVi5/NjjHznhLGaLhzCtpQTDzLo=";
+                  doCheck = false;
+                };
               }
+
             );
           };
 
@@ -187,6 +194,7 @@
           };
         in
         {
+
           overlayAttrs.haskell = customHaskell;
 
           devenv.modules = [ devenvSetup ];

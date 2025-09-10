@@ -74,7 +74,7 @@ library
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends: base ^>=4.20.0.0
+    build-depends: base >=4.20.0.0
                  , aeson
                  , bytestring
                  , containers
@@ -112,7 +112,7 @@ executable pisa
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends: base ^>=4.20.0.0
+    build-depends: base >=4.20.0.0
                  , pisa
                  , aeson
                  , bytestring
@@ -139,7 +139,7 @@ executable pisa
 Test-Suite test-pisa
   type:                exitcode-stdio-1.0
   main-is:             Test.hs
-  build-depends:       base >= 4.17
+  build-depends:       base >= 4.20
                      , pisa
                      , text
                      , containers
